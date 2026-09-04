@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://enemy000000001"]
+
+[ext_resource type="Script" path="res://scenes/enemies/enemy.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/combat/health_component.gd" id="2"]
+
+[sub_resource type="SphereShape3D" id="shape"]
+radius=0.55
+
+[sub_resource type="SphereMesh" id="mesh"]
+radius=0.55
+height=1.1
+
+[sub_resource type="StandardMaterial3D" id="mat"]
+roughness=0.7
+
+[sub_resource type="SphereMesh" id="eye_mesh"]
+radius=0.12
+height=0.24
+
+[sub_resource type="StandardMaterial3D" id="eye_mat"]
+albedo_color=Color(0.1, 0.1, 0.12, 1)
+emission_enabled=true
+emission=Color(1, 0.3, 0.2, 1)
+emission_energy_multiplier=1.5
+
+[node name="Enemy" type="CharacterBody3D"]
+collision_layer=2
+collision_mask=17
+script=ExtResource("1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape=SubResource("shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+mesh=SubResource("mesh")
+surface_material_override/0=SubResource("mat")
+
+[node name="Eye" type="MeshInstance3D" parent="Mesh"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, -0.48)
+mesh=SubResource("eye_mesh")
+surface_material_override/0=SubResource("eye_mat")
+
+[node name="HealthComponent" type="Node" parent="."]
+script=ExtResource("2")

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://endata_fast0001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fast_wisp"
+display_name = "Fast Wisp"
+color = Color(0.808, 0.576, 0.847, 1)
+scale = 0.75
+max_hp = 8.0
+damage = 5.0
+move_speed = 6.0
+armor = 0.0
+movement_type = "chase"
+attack_range = 1.3
+attack_cooldown = 0.8
+xp = 2.0
+gold = 0.5
+spawn_weight = 6.0
+threat_cost = 2.0

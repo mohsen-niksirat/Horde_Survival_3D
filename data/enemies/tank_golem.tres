@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://endata_tank0001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "tank_golem"
+display_name = "Tank Golem"
+color = Color(0.553, 0.431, 0.388, 1)
+scale = 1.6
+max_hp = 80.0
+damage = 20.0
+move_speed = 1.5
+armor = 3.0
+movement_type = "chase"
+attack_range = 2.2
+attack_cooldown = 1.5
+xp = 5.0
+gold = 1.5
+spawn_weight = 3.0
+threat_cost = 4.0

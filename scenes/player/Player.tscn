@@ -1,8 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://player00000001"]
+[gd_scene load_steps=11 format=3 uid="uid://player00000001"]
 
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/movement_component.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/player/camera_rig.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/combat/health_component.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/player/experience_component.gd" id="5"]
 
 [sub_resource type="CapsuleShape3D" id="capsule"]
 radius=0.45
@@ -46,6 +48,12 @@ surface_material_override/0=SubResource("head_mat")
 [node name="MovementComponent" type="Node" parent="."]
 script=ExtResource("2")
 
+[node name="HealthComponent" type="Node" parent="."]
+script=ExtResource("4")
+
+[node name="ExperienceComponent" type="Node" parent="."]
+script=ExtResource("5")
+
 [node name="CameraRig" type="Node3D" parent="."]
 transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
 script=ExtResource("3")
@@ -59,3 +67,12 @@ margin=0.25
 [node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D"]
 fov=60.0
 current=true
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer=1
+collision_mask=0
+monitoring=false
+
+[node name="HurtboxShape" type="CollisionShape3D" parent="Hurtbox"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape=SubResource("capsule")

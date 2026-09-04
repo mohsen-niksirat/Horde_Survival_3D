@@ -1,16 +1,24 @@
 extends Node3D
-## Root game orchestrator: owns per-run systems, global input routing,
-## mouse capture, and the debug overlay.
+## Root game orchestrator: owns per-run systems (enemy manager), global input
+## routing, mouse capture, and the debug overlay.
+
+const ENEMY_MANAGER := preload("res://scripts/spawning/enemy_manager.gd")
 
 @onready var player: CharacterBody3D = $World/Player
 @onready var touch_controls: Control = $HUD/TouchControls
 @onready var debug_label: Label = $HUD/DebugLabel
 
+var enemy_manager: Node
 var _debug_enabled: bool = false
 
 func _ready() -> void:
 	RunManager.start_run()
 	GameManager.change_state(GameManager.State.PLAYING)
+
+	enemy_manager = Node.new()
+	enemy_manager.set_script(ENEMY_MANAGER)
+	enemy_manager.name = "EnemyManager"
+	add_child(enemy_manager)
 
 	if DisplayServer.is_touchscreen_available():
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -20,6 +28,9 @@ func _ready() -> void:
 		touch_controls.visible = false
 
 	debug_label.visible = false
+
+func get_enemy_manager() -> Node:
+	return enemy_manager
 
 func _unhandled_input(event: InputEvent) -> void:
 	if InputManager.is_pause_just_pressed():
@@ -32,7 +43,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			debug_label.visible = _debug_enabled
 			get_viewport().set_input_as_handled()
 			return
-	# Click to recapture mouse on desktop
 	if event is InputEventMouseButton and event.pressed:
 		if not DisplayServer.is_touchscreen_available() and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 			if GameManager.state == GameManager.State.PLAYING:

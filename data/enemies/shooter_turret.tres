@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://endata_turret01"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "shooter_turret"
+display_name = "Shooter Turret"
+color = Color(1, 0.8, 0.5, 1)
+scale = 1.1
+max_hp = 25.0
+damage = 12.0
+move_speed = 0.0
+armor = 1.0
+movement_type = "stationary"
+attack_range = 12.0
+attack_cooldown = 2.0
+xp = 3.0
+gold = 1.0
+spawn_weight = 4.0
+threat_cost = 3.0
