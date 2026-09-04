@@ -1,0 +1,86 @@
+# HordeSurvival 3D
+
+A stylized third-person survival roguelite for the browser. Survive increasingly dangerous hordes, auto-attack weapons, collect XP, choose powerful upgrades, evolve weapons, fight elites and a phased boss — and build increasingly broken runs.
+
+**Play:** https://mohsen-niksirat.github.io/Horde_Survival_3D/ (after Pages is enabled)
+
+Inspired by the gameplay philosophy of [HordeSurvival (Android)](https://github.com/mohsen-niksirat/HordeSurvival), rebuilt from scratch as an independent Godot 4 project.
+
+## Features
+
+- Third-person 3D arena combat, camera-relative movement, zero aiming
+- 5 auto-firing weapons: Fireball (AOE), Magic Missile (homing), Orbiting Shield (orbit), Divine Spear (pierce/crit), Lightning (AOE strike)
+- 2 weapon evolutions: Hellfire (Fireball T5 + Spinach max) and Holy Bible (Magic Missile T5 + Tome max)
+- 5 enemy archetypes + 8 modular elite abilities + one complete 3-phase boss
+- XP orbs with magnet pickup, level-ups with 3 rarity-colored choices, 8 passive items
+- Relics (rarity-weighted map pickups incl. Phoenix Feather revive), a pet (Dragon Welp), 2 active abilities (Meteor Strike, Time Freeze)
+- Combo system with XP multiplier and 6 visual tiers, 10 achievements with gold rewards
+- Threat-budget horde spawning, difficulty timeline, quality-tier entity caps
+- Versioned meta save (gold, bests, achievements) that persists in the browser
+- Responsive HUD; virtual joystick + touch camera on mobile
+
+## How to Run Locally
+
+1. Install [Godot 4.3+](https://godotengine.org/download)
+2. Open `project.godot` in the Godot editor
+3. Press **F5** (Play)
+
+## How to Export Web
+
+1. In Godot: **Project → Export → Web** (preset included in `export_presets.cfg`)
+2. Ensure the Web export templates are installed (Editor → Manage Export Templates)
+3. Export to `build/web/index.html`
+
+Or use the CI workflow (below) which does this automatically.
+
+## How to Deploy to GitHub Pages
+
+Deployment is automated via GitHub Actions (`.github/workflows/deploy-web.yml`):
+
+1. Push to `main`
+2. Enable **Settings → Pages → Source: GitHub Actions** (one time)
+3. The workflow builds the Web export and deploys it to Pages
+
+Manual URL after setup: `https://mohsen-niksirat.github.io/Horde_Survival_3D/`
+
+## How to Export Android (future)
+
+Architecture is Android-compatible (Compatibility renderer, touch-first input abstraction). Android export steps will be added post-MVP: install Android build template (`Project → Install Android Build Template`), add the Android preset, export APK/AAB.
+
+## Controls
+
+| Action | Desktop | Mobile | Gamepad |
+|---|---|---|---|
+| Move | WASD / Arrows | Left virtual joystick | Left stick |
+| Camera | Mouse (captured) / Arrow keys | Right touch drag | Right stick |
+| Ability 1 (Meteor) | Q | Button | Trigger |
+| Ability 2 (Freeze) | E | Button | Trigger |
+| Pause | Esc | — | Start |
+| Debug overlay | F3 | — | — |
+
+## Architecture Overview
+
+```
+scenes/  bootstrap · main · menu · world · player · enemies · weapons · bosses · pickups · ui
+scripts/ core · player · combat · enemies · spawning · weapons · abilities · items ·
+         progression · save · input · audio · performance · utilities
+data/    weapons · enemies · passives · relics · abilities (all .tres data-driven)
+web/     custom HTML shell (loading bar, Click-to-Play, WebGL fallback)
+tests/   headless smoke + phase test suites (godot --headless --script tests/<t>.gd)
+```
+
+Key systems:
+- **Autoloads**: EventBus (signal hub), RunManager (run session), GameManager (state machine), InputManager (platform abstraction), PoolManager (deferred-release pooling), SaveManager (versioned JSON), AudioManager (procedural SFX), PerformanceManager (quality tiers + caps)
+- **Per-run**: WaveManager (threat budget), EnemyManager (registry + queries), ProgressionManager (level-ups/evolutions), RelicSystem, ComboManager, AchievementSystem, AbilityController
+- **Data-driven**: all content lives in `.tres` resources — new enemies/weapons/relics = new resource files
+- **Combat pipeline**: single DamageEvent flow (crit → armor → status → death → loot → combo → achievements)
+
+## Development
+
+Phased development per `docs/ROADMAP.md`; design rationale in `docs/GAME_DESIGN.md`, `docs/ARCHITECTURE.md`, and reference analysis in `docs/EXISTING_GAME_ANALYSIS.md`.
+
+Run all headless tests:
+
+```powershell
+godot --headless --path . --script res://tests/smoke_phase1.gd   # (and test_phase2..10)
+```

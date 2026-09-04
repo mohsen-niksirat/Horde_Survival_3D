@@ -14,9 +14,9 @@
 | **7 — Multiple Weapons** | Magic Missile (homing), Orbiting Shield (orbit), Divine Spear (pierce/crit), Lightning (AOE strike); status effects v1 (burn, slow); targeting modes (nearest/lowest/random/area) | 5 working, distinct weapons | ⬜ |
 | **8 — Elites + Boss** | EliteComponent (8 modular abilities), elite cadence, ONE complete boss (phases 1/2/enrage, telegraphs, minion summons, rewards), boss intro/outro | Elites appear with abilities; boss fight is complete and beatable | ⬜ |
 | **9 — Horde Survival Systems** | 2 weapon evolutions, relics (rarity pickups), 1 pet (Dragon Welp), 2 active abilities (Meteor Strike, Time Freeze), combo system, achievements (8–10), save system v1 | Meta + run systems integrated AND wired into HUD/menus (no "unwired systems") | ⬜ |
-| **10 — Polish** | VFX pass (hit flash, death, level-up, boss), camera shake, low-HP vignette, sound pass + volume settings, loading screen, settings menu, responsive/mobile UI pass | Game feels finished, not prototype | ⬜ |
-| **11 — Optimization** | Profile desktop+mobile web; MultiMesh for orbs if needed; draw call / pool / particle tuning; quality tiers (Low/Med/High) auto-detect | 60 FPS desktop, 30+ FPS mid-range mobile in 200-enemy stress scene | ⬜ |
-| **12 — Web Deployment** | Export preset, GitHub Actions workflow, GitHub Pages deploy, loading shell, Click-to-Play, PWA manifest, WebGL fallback | Public playable URL on Pages | ⬜ |
+| **10 — Polish** | VFX pass (hit flash, death, level-up, boss), camera shake, low-HP vignette, sound pass + volume settings, loading screen, settings menu, responsive/mobile UI pass | Game feels finished, not prototype | ✅ done |
+| **11 — Optimization** | Profile desktop+mobile web; MultiMesh for orbs if needed; draw call / pool / particle tuning; quality tiers (Low/Med/High) auto-detect | 60 FPS desktop, 30+ FPS mid-range mobile in 200-enemy stress scene | ⬜ quality tiers + caps shipped; device profiling pending |
+| **12 — Web Deployment** | Export preset, GitHub Actions workflow, GitHub Pages deploy, loading shell, Click-to-Play, PWA manifest, WebGL fallback | Public playable URL on Pages | ✅ done (pending first CI run + Pages enable) |
 | **Post-MVP backlog** | Remaining evolutions (8 total), more enemies (ghost/splitter/healer/mage), more pets/abilities/characters, meta upgrades shop, daily challenge, redesigned TD, Android export | — | ⬜ |
 
 ## Phase testing checklists (minimum)

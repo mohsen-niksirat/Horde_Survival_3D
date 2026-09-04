@@ -1,0 +1,58 @@
+name: Deploy Web Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: lihop/setup-godot@v2
+        with:
+          version: "4.3-stable"
+          export-templates: true
+
+      - name: Import assets (headless)
+        run: |
+          godot --headless --import 2>&1 | true
+          godot --headless --import 2>&1 | true
+
+      - name: Export Web build
+        run: |
+          mkdir -p build/web
+          godot --headless --export-release "Web" build/web/index.html
+
+      - name: Deploy shell page
+        run: |
+          cp web/index.html build/web/index_shell.html || true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
