@@ -10,22 +10,45 @@ extends Control
 @onready var how_to_play_button: Button = $Center/Layout/HowToPlayButton
 @onready var quit_button: Button = $Center/Layout/QuitButton
 @onready var notice_label: Label = $Notice
+@onready var stats_label: Label = $Stats
 
 func _ready() -> void:
 	play_button.pressed.connect(_on_play_pressed)
-	characters_button.pressed.connect(_on_placeholder_pressed.bind("Characters coming in Phase 6+"))
+	characters_button.pressed.connect(_on_placeholder_pressed.bind("Characters coming post-MVP"))
 	weapons_button.pressed.connect(_on_placeholder_pressed.bind("Weapons collection coming soon"))
-	achievements_button.pressed.connect(_on_placeholder_pressed.bind("Achievements coming in Phase 9"))
-	settings_button.pressed.connect(_on_placeholder_pressed.bind("Settings coming in Phase 10"))
-	how_to_play_button.pressed.connect(_on_placeholder_pressed.bind("WASD to move - survive the horde - weapons fire automatically"))
+	achievements_button.pressed.connect(_on_achievements_pressed)
+	settings_button.pressed.connect(_on_settings_pressed)
+	how_to_play_button.pressed.connect(_on_placeholder_pressed.bind("WASD to move - survive the horde - weapons fire automatically - Q/E abilities"))
 	quit_button.pressed.connect(_on_quit_pressed)
 	notice_label.text = ""
+	_update_stats()
+
+func _update_stats() -> void:
+	var gold: int = SaveManager.get_meta_data("gold", 0)
+	var best_time: float = SaveManager.get_meta_data("best_time", 0.0)
+	var total_kills: int = SaveManager.get_meta_data("total_kills", 0)
+	var achievements: Dictionary = SaveManager.get_meta_data("achievements", {})
+	var minutes := int(best_time) / 60
+	var seconds := int(best_time) % 60
+	stats_label.text = "Gold: %d | Best: %02d:%02d | Kills: %d | Achievements: %d" % [
+		gold, minutes, seconds, total_kills, achievements.size()
+	]
 
 func _on_play_pressed() -> void:
+	AudioManager.play_game_sfx("ui_click")
 	play_button.disabled = true
 	GameManager.start_game()
 
+func _on_achievements_pressed() -> void:
+	var achievements: Dictionary = SaveManager.get_meta_data("achievements", {})
+	notice_label.text = "Unlocked achievements: %s" % (", ".join(achievements.keys()) if achievements.size() > 0 else "none yet")
+
+func _on_settings_pressed() -> void:
+	AudioManager.play_game_sfx("ui_click")
+	$SettingsMenu.open()
+
 func _on_placeholder_pressed(message: String) -> void:
+	AudioManager.play_game_sfx("ui_click")
 	notice_label.text = message
 
 func _on_quit_pressed() -> void:

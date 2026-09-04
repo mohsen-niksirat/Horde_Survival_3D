@@ -91,6 +91,14 @@ func _ready() -> void:
 	# UI bindings
 	$HUD/Hud.bind_player(player)
 	$HUD/Hud.bind_abilities(ability_controller)
+	$HUD/ScreenFeedback.bind_player(player)
+
+	# SFX event binding (autoload-style per-run listener)
+	var sfx_binder := Node.new()
+	sfx_binder.set_script(preload("res://scripts/audio/sfx_binder.gd"))
+	sfx_binder.name = "SfxBinder"
+	add_child(sfx_binder)
+	AudioManager.apply_saved_volumes()
 
 	# Boss death → back to PLAYING state
 	EventBus.boss_died.connect(_on_boss_died)

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://menu0000000001"]
+[gd_scene load_steps=3 format=3 uid="uid://menu0000000001"]
 
 [ext_resource type="Script" path="res://scenes/menu/main_menu.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/menu/SettingsMenu.tscn" id="2"]
 
 [node name="MainMenu" type="Control"]
 layout_mode=3
@@ -105,3 +106,20 @@ theme_override_font_sizes/font_size=16
 theme_override_colors/font_color=Color(0.85, 0.8, 0.4, 1)
 horizontal_alignment=1
 vertical_alignment=1
+
+[node name="Stats" type="Label" parent="."]
+layout_mode=1
+anchors_preset=12
+anchor_top=1.0
+anchor_right=1.0
+anchor_bottom=1.0
+offset_top=-40.0
+offset_bottom=-10.0
+grow_horizontal=2
+grow_vertical=0
+theme_override_font_sizes/font_size=14
+theme_override_colors/font_color=Color(0.5, 0.75, 0.6, 1)
+horizontal_alignment=1
+vertical_alignment=1
+
+[node name="SettingsMenu" parent="." instance=ExtResource("2")]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://main0000000001"]
+[gd_scene load_steps=10 format=3 uid="uid://main0000000001"]
 
 [ext_resource type="Script" path="res://scenes/main/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/world/Arena.tscn" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/LevelUpOverlay.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/ui/GameOverOverlay.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ScreenFeedback.tscn" id="9"]
 
 [node name="Main" type="Node3D"]
 script=ExtResource("1")
@@ -27,6 +28,8 @@ script=ExtResource("1")
 [node name="GameOverOverlay" parent="HUD" instance=ExtResource("8")]
 
 [node name="Hud" parent="HUD" instance=ExtResource("7")]
+
+[node name="ScreenFeedback" parent="HUD" instance=ExtResource("9")]
 
 [node name="DebugLabel" type="Label" parent="HUD"]
 anchors_preset=1

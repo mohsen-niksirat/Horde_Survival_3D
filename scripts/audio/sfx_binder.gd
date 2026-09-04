@@ -1,0 +1,47 @@
+extends Node
+## SfxBinder: translates EventBus signals into procedural SFX calls.
+## Keeps gameplay code free of audio calls.
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	EventBus.enemy_damaged.connect(_on_enemy_damaged)
+	EventBus.enemy_died.connect(_on_enemy_died)
+	EventBus.player_damaged.connect(_on_player_damaged)
+	EventBus.player_leveled_up.connect(_on_level_up)
+	EventBus.xp_collected.connect(_on_xp)
+	EventBus.boss_spawned.connect(_on_boss_spawned)
+	EventBus.boss_died.connect(_on_boss_died)
+
+var _last_hit_ms: int = 0
+
+func _on_enemy_damaged(_enemy: Node, _amount: float, _crit: bool) -> void:
+	# Throttle identical hit sounds (reference-game lesson: 15 sounds/sec max)
+	var now := Time.get_ticks_msec()
+	if now - _last_hit_ms < 50:
+		return
+	_last_hit_ms = now
+	AudioManager.play_game_sfx("enemy_hit")
+
+func _on_enemy_died(_enemy: Node, _pos: Vector3) -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_hit_ms < 50:
+		return
+	AudioManager.play_game_sfx("enemy_death")
+
+func _on_player_damaged(_amount: float) -> void:
+	AudioManager.play_game_sfx("player_hurt")
+
+func _on_level_up(_level: int) -> void:
+	AudioManager.play_game_sfx("level_up")
+
+func _on_xp(_amount: float) -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_hit_ms < 60:
+		return
+	AudioManager.play_game_sfx("xp_pickup")
+
+func _on_boss_spawned(_boss: Node) -> void:
+	AudioManager.play_game_sfx("boss_warn")
+
+func _on_boss_died() -> void:
+	AudioManager.play_game_sfx("boss_die")

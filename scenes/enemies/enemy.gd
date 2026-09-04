@@ -145,6 +145,11 @@ func _on_died() -> void:
 		elite.on_death()
 	EventBus.enemy_died.emit(self, global_position)
 	died.emit(self)
+	# Death shrink effect happens while the pooled node leaves the tree
+	if _mesh != null:
+		var tween := create_tween()
+		tween.tween_property(_mesh, "scale", Vector3(0.01, 0.01, 0.01), 0.18)
+		tween.tween_callback(func(): _mesh.scale = Vector3.ONE)
 
 ## Called by the pool manager flow (or spawner) when recycled.
 func despawn() -> void:
