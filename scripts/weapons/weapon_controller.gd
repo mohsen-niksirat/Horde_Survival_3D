@@ -39,6 +39,9 @@ func fire_weapon(weapon: WeaponInstance, player: Node3D, target: Node3D) -> void
 func _fire_projectile(weapon: WeaponInstance, player: Node3D, target: Node3D) -> void:
 	var count := weapon.get_projectile_count()
 	var spawn_pos := player.global_position + Vector3(0, 1.2, 0)
+	var might: float = 1.0
+	if player.has_method("get_stat"):
+		might = player.get_stat("might")
 	for i in range(count):
 		var proj := PoolManager.acquire(FIREBALL_SCENE)
 		PoolManager.tag(proj, FIREBALL_SCENE)
@@ -48,7 +51,7 @@ func _fire_projectile(weapon: WeaponInstance, player: Node3D, target: Node3D) ->
 		if i > 0:
 			var spread := deg_to_rad(8.0 * i) * (1 if i % 2 == 1 else -1)
 			aim = aim.rotated(Vector3.UP, spread)
-		proj.setup(weapon, weapon.get_damage(), weapon.get_area(), weapon.get_crit_chance(), weapon.data, spawn_pos, aim.normalized())
+		proj.setup(weapon, weapon.get_damage() * might, weapon.get_area() * player.get_stat("area_mult") if player.has_method("get_stat") else weapon.get_area(), weapon.get_crit_chance(), weapon.data, spawn_pos, aim.normalized())
 	PerformanceManager.active_projectiles = _projectile_root.get_child_count()
 
 func _fire_aoe(weapon: WeaponInstance, player: Node3D, target: Node3D) -> void:

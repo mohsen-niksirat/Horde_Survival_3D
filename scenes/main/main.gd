@@ -1,9 +1,10 @@
 extends Node3D
-## Root game orchestrator: owns per-run systems (enemy manager), global input
-## routing, mouse capture, and the debug overlay.
+## Root game orchestrator: owns per-run systems (enemy manager, progression),
+## global input routing, mouse capture, and the debug overlay.
 
 const ENEMY_MANAGER := preload("res://scripts/spawning/enemy_manager.gd")
 const WAVE_MANAGER := preload("res://scripts/spawning/wave_manager.gd")
+const PROGRESSION := preload("res://scripts/progression/progression_manager.gd")
 
 @onready var player: CharacterBody3D = $World/Player
 @onready var touch_controls: Control = $HUD/TouchControls
@@ -11,6 +12,7 @@ const WAVE_MANAGER := preload("res://scripts/spawning/wave_manager.gd")
 
 var enemy_manager: Node
 var wave_manager: Node
+var progression: Node
 var projectile_root: Node3D
 var _debug_enabled: bool = false
 
@@ -35,6 +37,18 @@ func _ready() -> void:
 	wave_manager.name = "WaveManager"
 	add_child(wave_manager)
 	wave_manager.setup($World, player, enemy_manager)
+
+	# Progression + level-up UI (Phase 6)
+	progression = Node.new()
+	progression.set_script(PROGRESSION)
+	progression.name = "ProgressionManager"
+	add_child(progression)
+	progression.setup(player)
+	player.progression = progression
+	$HUD/LevelUpOverlay.bind_progression(progression)
+
+	# HUD
+	$HUD/Hud.bind_player(player)
 
 	if DisplayServer.is_touchscreen_available():
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

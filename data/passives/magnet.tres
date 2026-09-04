@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PassiveData" load_steps=2 format=3 uid="uid://cpassive05e"]
+
+[ext_resource type="Script" path="res://scripts/progression/passive_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "magnet"
+display_name = "Magnet"
+description = "+25% pickup range per level"
+max_level = 5
+modifiers = [{"stat": "pickup_radius", "flat": 0.0, "percent": 0.25}]

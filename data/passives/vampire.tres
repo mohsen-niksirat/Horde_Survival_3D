@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PassiveData" load_steps=2 format=3 uid="uid://cpassive08h"]
+
+[ext_resource type="Script" path="res://scripts/progression/passive_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "vampire"
+display_name = "Vampire Fang"
+description = "+0.5 HP/s regen per level"
+max_level = 5
+modifiers = [{"stat": "regen", "flat": 0.5, "percent": 0.0}]

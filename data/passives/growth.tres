@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PassiveData" load_steps=2 format=3 uid="uid://cpassive07g"]
+
+[ext_resource type="Script" path="res://scripts/progression/passive_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "growth"
+display_name = "Growth"
+description = "+10% XP gain per level"
+max_level = 5
+modifiers = [{"stat": "xp_gain", "flat": 0.0, "percent": 0.1}]

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PassiveData" load_steps=2 format=3 uid="uid://cpassive01a"]
+
+[ext_resource type="Script" path="res://scripts/progression/passive_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "spinach"
+display_name = "Spinach"
+description = "+10% damage per level"
+max_level = 5
+modifiers = [{"stat": "might", "flat": 0.0, "percent": 0.1}]

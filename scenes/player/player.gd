@@ -11,6 +11,9 @@ const CONTACT_INVINCIBILITY := 0.5
 @onready var experience: Node = $ExperienceComponent
 @onready var weapon_controller: Node = $WeaponController
 
+var stat_block: StatBlock
+var progression: Node = null  # set by Main
+
 var _face_yaw: float = 0.0
 var _bob_time: float = 0.0
 var _base_mesh_y: float = 0.0
@@ -18,6 +21,7 @@ var _base_hp: float = 100.0
 
 func _ready() -> void:
 	add_to_group("player")
+	stat_block = StatBlock.new({"max_hp": _base_hp, "move_speed": 6.0, "pickup_radius": 3.0})
 	movement.setup(self)
 	_base_mesh_y = mesh.position.y
 	_face_yaw = rotation.y
@@ -33,6 +37,20 @@ func bind_combat(enemy_manager: Node, projectile_root: Node3D) -> void:
 	weapon_controller.setup(self, enemy_manager, projectile_root)
 	# MVP starting weapon (Phase 6 makes this data/character-driven)
 	weapon_controller.add_weapon(load("res://data/weapons/fireball.tres"))
+
+func get_pickup_radius() -> float:
+	return stat_block.get_stat("pickup_radius")
+
+func get_stat(stat: String) -> float:
+	return stat_block.get_stat(stat)
+
+func on_stats_changed() -> void:
+	## Re-apply derived stats after a modifier changed.
+	var max_hp: float = stat_block.get_stat("max_hp")
+	if max_hp > health.max_hp:
+		health.heal(max_hp - health.max_hp)
+	health.max_hp = max_hp
+	movement.base_speed = stat_block.get_stat("move_speed")
 
 func _on_xp_collected(amount: float) -> void:
 	experience.add_xp(amount)
@@ -61,9 +79,6 @@ func _physics_process(delta: float) -> void:
 		_bob_time = 0.0
 		mesh.position.y = lerpf(mesh.position.y, _base_mesh_y, 8.0 * delta)
 		mesh.rotation.x = lerpf(mesh.rotation.x, 0.0, 8.0 * delta)
-
-func get_pickup_radius() -> float:
-	return movement.get_max_speed() * 0.5 + 2.5
 
 ## Called by enemies on contact attacks.
 func take_contact_damage(amount: float, from_position: Vector3) -> void:
@@ -104,10 +119,9 @@ func _drop_xp(enemy: Node, position: Vector3) -> void:
 		orb.setup(per_orb, self, position)
 
 func _on_leveled_up(new_level: int) -> void:
-	# Phase 6 replaces this with the full upgrade-choice flow.
-	GameManager.open_level_up()
-	await get_tree().create_timer(0.1, true, false, true).timeout
-	GameManager.close_level_up()
+	# ProgressionManager handles pause + choice UI (supports stacked levels)
+	if progression != null:
+		progression.offer_choices()
 
 func _on_died() -> void:
 	EventBus.player_died.emit()

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PassiveData" load_steps=2 format=3 uid="uid://cpassive03c"]
+
+[ext_resource type="Script" path="res://scripts/progression/passive_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "crown"
+display_name = "Crown"
+description = "+8% area per level"
+max_level = 5
+modifiers = [{"stat": "area_mult", "flat": 0.0, "percent": 0.08}]

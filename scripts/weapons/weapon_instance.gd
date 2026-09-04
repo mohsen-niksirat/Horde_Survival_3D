@@ -33,7 +33,11 @@ func tick(delta: float, player: Node3D, enemies: Node) -> void:
 		_cooldown_left = 0.1
 		return
 
-	_cooldown_left = get_cooldown()
+	# Apply player attack_speed + cooldown_mult modifiers
+	var cd := get_cooldown()
+	if player.has_method("get_stat"):
+		cd = cd / maxf(player.get_stat("attack_speed"), 0.1) * maxf(player.get_stat("cooldown_mult"), 0.2)
+	_cooldown_left = maxf(cd, 0.15)
 	_combat_context.fire_weapon(self, player, target)
 	fired.emit()
 

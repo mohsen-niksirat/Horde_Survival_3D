@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://main0000000001"]
+[gd_scene load_steps=8 format=3 uid="uid://main0000000001"]
 
 [ext_resource type="Script" path="res://scenes/main/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/world/Arena.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/ui/TouchControls.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseOverlay.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LevelUpOverlay.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="7"]
 
 [node name="Main" type="Node3D"]
 script=ExtResource("1")
@@ -18,6 +20,10 @@ script=ExtResource("1")
 [node name="TouchControls" parent="HUD" instance=ExtResource("4")]
 
 [node name="PauseOverlay" parent="HUD" instance=ExtResource("5")]
+
+[node name="LevelUpOverlay" parent="HUD" instance=ExtResource("6")]
+
+[node name="Hud" parent="HUD" instance=ExtResource("7")]
 
 [node name="DebugLabel" type="Label" parent="HUD"]
 anchors_preset=1
