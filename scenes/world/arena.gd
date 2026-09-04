@@ -1,18 +1,10 @@
 extends Node3D
-## Arena environment script. Holds spawn-point helpers and camera config for
-## the placeholder overview camera until the third-person rig (Phase 2).
+## Arena environment script. Holds spawn-point helpers used by spawning
+## systems (Phase 5+).
 
 const HALF_SIZE := 60.0
 const SPAWN_RING_MIN := 35.0
 const SPAWN_RING_MAX := 45.0
-
-@onready var camera: Camera3D = $OverviewCamera
-
-func _ready() -> void:
-	if camera:
-		camera.position = Vector3(0, 30, 22)
-		camera.rotation_degrees = Vector3(-55, 0, 0)
-		camera.current = true
 
 ## Returns a random spawn position on a ring around a center point,
 ## clamped inside the arena.

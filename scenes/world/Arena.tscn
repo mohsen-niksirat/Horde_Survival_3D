@@ -171,8 +171,3 @@ surface_material_override/0=SubResource("pillar_mat")
 transform=Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -8, 0.7, -26)
 mesh=SubResource("rock_mesh")
 surface_material_override/0=SubResource("pillar_mat")
-
-[node name="OverviewCamera" type="Camera3D" parent="."]
-transform=Transform3D(1, 0, 0, 0, 0.573576, 0.819152, 0, -0.819152, 0.573576, 0, 30, 22)
-fov=60.0
-current=true
