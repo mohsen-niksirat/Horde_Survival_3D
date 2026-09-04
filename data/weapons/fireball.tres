@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3 uid="uid://wdata_fireball1"]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fireball"
+display_name = "Fireball"
+type = "projectile"
+base_damage = 20.0
+base_cooldown = 2.0
+projectile_count = 1
+projectile_speed = 18.0
+area = 2.2
+pierce = 0
+crit_chance = 0.05
+crit_mult = 2.0
+max_range = 30.0
+status_effect = ""
+status_duration = 0.0
+status_damage = 0.0
+projectile_scene = "res://scenes/weapons/FireballProjectile.tscn"

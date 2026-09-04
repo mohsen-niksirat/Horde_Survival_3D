@@ -9,6 +9,7 @@ const ENEMY_MANAGER := preload("res://scripts/spawning/enemy_manager.gd")
 @onready var debug_label: Label = $HUD/DebugLabel
 
 var enemy_manager: Node
+var projectile_root: Node3D
 var _debug_enabled: bool = false
 
 func _ready() -> void:
@@ -19,6 +20,12 @@ func _ready() -> void:
 	enemy_manager.set_script(ENEMY_MANAGER)
 	enemy_manager.name = "EnemyManager"
 	add_child(enemy_manager)
+
+	# Projectile container + weapon binding
+	projectile_root = Node3D.new()
+	projectile_root.name = "Projectiles"
+	add_child(projectile_root)
+	player.bind_combat(enemy_manager, projectile_root)
 
 	if DisplayServer.is_touchscreen_available():
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

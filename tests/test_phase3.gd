@@ -16,6 +16,10 @@ func _initialize() -> void:
 	var game_manager := root.get_node("GameManager")
 	game_manager.state = game_manager.State.PLAYING
 
+	# Phase 4+ gives the player an auto-firing fireball; clear it so the
+	# enemy survives for the contact-damage portion of this test.
+	player.weapon_controller.weapons.clear()
+
 	# --- Spawn an enemy near the player ---
 	var drone: EnemyData = load("res://data/enemies/basic_drone.tres")
 	_check(drone != null, "basic_drone resource loads")

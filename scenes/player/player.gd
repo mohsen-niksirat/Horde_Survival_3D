@@ -9,6 +9,7 @@ const CONTACT_INVINCIBILITY := 0.5
 @onready var mesh: MeshInstance3D = $Mesh
 @onready var health: Node = $HealthComponent
 @onready var experience: Node = $ExperienceComponent
+@onready var weapon_controller: Node = $WeaponController
 
 var _face_yaw: float = 0.0
 var _bob_time: float = 0.0
@@ -26,6 +27,12 @@ func _ready() -> void:
 	experience.leveled_up.connect(_on_leveled_up)
 	EventBus.enemy_died.connect(_on_enemy_died)
 	EventBus.xp_collected.connect(_on_xp_collected)
+
+func bind_combat(enemy_manager: Node, projectile_root: Node3D) -> void:
+	## Called by Main after both player and systems exist.
+	weapon_controller.setup(self, enemy_manager, projectile_root)
+	# MVP starting weapon (Phase 6 makes this data/character-driven)
+	weapon_controller.add_weapon(load("res://data/weapons/fireball.tres"))
 
 func _on_xp_collected(amount: float) -> void:
 	experience.add_xp(amount)

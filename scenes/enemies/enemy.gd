@@ -20,6 +20,7 @@ var _mesh: MeshInstance3D
 var _mat: StandardMaterial3D
 
 func _ready() -> void:
+	add_to_group("enemies")
 	health = $HealthComponent
 	health.died.connect(_on_died)
 	_mesh = $Mesh
