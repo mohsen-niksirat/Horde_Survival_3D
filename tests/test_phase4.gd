@@ -17,6 +17,10 @@ func _initialize() -> void:
 	var game_manager := root.get_node("GameManager")
 	game_manager.state = game_manager.State.PLAYING
 
+	# Isolate from the horde system so the fireball target is deterministic.
+	main.get_node("WaveManager").stop()
+	em.clear_all()
+
 	_check(player.weapon_controller.weapons.size() == 1, "fireball equipped")
 	var weapon = player.weapon_controller.weapons[0]
 	_check(weapon.data.id == "fireball", "weapon is fireball")
