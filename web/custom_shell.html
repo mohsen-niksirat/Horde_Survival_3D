@@ -77,11 +77,12 @@
 				const pct = total > 0 ? (current / total) * 100 : 0;
 				bar.style.width = pct + '%';
 				statusEl.textContent = 'Loading assets... ' + Math.round(pct) + '%';
-				if (pct >= 100) {
-					statusEl.textContent = 'Ready!';
-					playBtn.style.display = 'block';
-				}
 			});
+			// Show PLAY immediately: the actual engine download starts on
+			// click (user gesture = audio unlock). Progress bar keeps
+			// updating during the download after the click.
+			statusEl.textContent = 'Ready!';
+			playBtn.style.display = 'block';
 			playBtn.addEventListener('click', () => {
 				playBtn.style.display = 'none';
 				loader.classList.add('hidden');
