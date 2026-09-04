@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3 uid="uid://wdata_missile01"]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "magic_missile"
+display_name = "Magic Missile"
+type = "projectile"
+base_damage = 8.0
+base_cooldown = 0.8
+projectile_count = 1
+projectile_speed = 20.0
+area = 0.5
+pierce = 0
+crit_chance = 0.05
+crit_mult = 2.0
+max_range = 25.0
+homing = true
+status_effect = ""
+status_duration = 0.0
+status_damage = 0.0
+projectile_scene = "res://scenes/weapons/MagicMissileProjectile.tscn"

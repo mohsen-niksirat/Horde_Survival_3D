@@ -8,6 +8,7 @@ const GRAVITY := 25.0
 
 var data: EnemyData
 var health: Node
+var status: Node
 var hp_scale: float = 1.0
 var dmg_scale: float = 1.0
 var spd_scale: float = 1.0
@@ -23,11 +24,24 @@ func _ready() -> void:
 	add_to_group("enemies")
 	health = $HealthComponent
 	health.died.connect(_on_died)
+	health.damaged.connect(_on_damaged)
+	status = $StatusComponent
+	status.setup(self)
 	_mesh = $Mesh
 	_mat = _mesh.get_surface_override_material(0)
 	if _mat == null:
 		_mat = StandardMaterial3D.new()
 		_mesh.set_surface_override_material(0, _mat)
+
+func _on_damaged(event: DamageEvent) -> void:
+	# Apply status from the damage pipeline
+	if event.status_effect != "":
+		status.apply(event.status_effect, event.status_duration)
+	# Hit flash
+	if data != null:
+		_mat.albedo_color = Color(3, 3, 3)
+		var tween := create_tween()
+		tween.tween_property(_mat, "albedo_color", data.color, 0.12)
 
 func setup(p_data: EnemyData, p_player: Node3D, p_hp_scale: float, p_dmg_scale: float, p_spd_scale: float) -> void:
 	data = p_data
@@ -69,7 +83,7 @@ func _physics_process(delta: float) -> void:
 			"stationary":
 				dir = Vector3.ZERO
 
-		var speed: float = data.move_speed * spd_scale
+		var speed: float = data.move_speed * spd_scale * status.get_speed_factor()
 		velocity.x = dir.x * speed
 		velocity.z = dir.z * speed
 		move_and_slide()

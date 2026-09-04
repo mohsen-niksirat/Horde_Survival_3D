@@ -17,6 +17,7 @@ extends Resource
 @export var crit_chance: float = 0.05
 @export var crit_mult: float = 2.0
 @export var max_range: float = 30.0
+@export var homing: bool = false
 
 @export_group("Status")
 @export var status_effect: String = ""

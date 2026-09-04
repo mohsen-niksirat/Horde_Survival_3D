@@ -18,7 +18,7 @@ var _owner_weapon: WeaponInstance
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 
-func setup(weapon: WeaponInstance, p_damage: float, p_area: float, p_crit: float, p_data: WeaponData, from_pos: Vector3, dir: Vector3) -> void:
+func setup_fireball(weapon: WeaponInstance, p_damage: float, p_area: float, p_crit: float, p_data: WeaponData, from_pos: Vector3, dir: Vector3) -> void:
 	_owner_weapon = weapon
 	damage = p_damage
 	aoe_radius = p_area

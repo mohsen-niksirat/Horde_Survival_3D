@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3 uid="uid://wdata_spear001"]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "divine_spear"
+display_name = "Divine Spear"
+type = "pierce"
+base_damage = 35.0
+base_cooldown = 2.5
+projectile_count = 1
+projectile_speed = 40.0
+area = 0.5
+pierce = 2
+crit_chance = 0.25
+crit_mult = 2.5
+max_range = 35.0
+homing = false
+status_effect = ""
+status_duration = 0.0
+status_damage = 0.0
+projectile_scene = "res://scenes/weapons/DivineSpearProjectile.tscn"

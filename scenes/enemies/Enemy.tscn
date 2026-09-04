@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://enemy000000001"]
+[gd_scene load_steps=9 format=3 uid="uid://enemy000000001"]
 
 [ext_resource type="Script" path="res://scenes/enemies/enemy.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/combat/health_component.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/combat/status_component.gd" id="3"]
 
 [sub_resource type="SphereShape3D" id="shape"]
 radius=0.55
@@ -44,3 +45,6 @@ surface_material_override/0=SubResource("eye_mat")
 
 [node name="HealthComponent" type="Node" parent="."]
 script=ExtResource("2")
+
+[node name="StatusComponent" type="Node" parent="."]
+script=ExtResource("3")
