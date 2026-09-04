@@ -9,9 +9,14 @@ const GRAVITY := 25.0
 var data: EnemyData
 var health: Node
 var status: Node
+var elite: Node = null
 var hp_scale: float = 1.0
 var dmg_scale: float = 1.0
 var spd_scale: float = 1.0
+var base_spd_scale: float = 1.0
+var xp_mult: float = 1.0
+var gold_mult: float = 1.0
+var dmg_mult: float = 1.0
 
 var _player: Node3D
 var _attack_timer: float = 0.0
@@ -41,7 +46,10 @@ func _on_damaged(event: DamageEvent) -> void:
 	if data != null:
 		_mat.albedo_color = Color(3, 3, 3)
 		var tween := create_tween()
-		tween.tween_property(_mat, "albedo_color", data.color, 0.12)
+		tween.tween_property(_mat, "albedo_color", _base_color(), 0.12)
+
+func _base_color() -> Color:
+	return Color(1.0, 0.8, 0.2) if elite != null else data.color
 
 func setup(p_data: EnemyData, p_player: Node3D, p_hp_scale: float, p_dmg_scale: float, p_spd_scale: float) -> void:
 	data = p_data
@@ -49,7 +57,16 @@ func setup(p_data: EnemyData, p_player: Node3D, p_hp_scale: float, p_dmg_scale: 
 	hp_scale = p_hp_scale
 	dmg_scale = p_dmg_scale
 	spd_scale = p_spd_scale
+	base_spd_scale = p_spd_scale
+	xp_mult = 1.0
+	gold_mult = 1.0
+	dmg_mult = 1.0
 	_wobble_seed = randf() * TAU
+
+	# Reset pooled state from a previous life
+	elite = null
+	health.damage_interceptor = Callable()
+	status.clear_all()
 
 	health.set_scaled(data.max_hp, data.armor, hp_scale)
 	_mat.albedo_color = data.color
@@ -58,6 +75,20 @@ func setup(p_data: EnemyData, p_player: Node3D, p_hp_scale: float, p_dmg_scale: 
 
 	_attack_timer = randf_range(0.0, data.attack_cooldown)
 	_alive = true
+
+## Promote this enemy to an elite with the given abilities.
+func make_elite(p_abilities: Array) -> void:
+	if elite != null:
+		return
+	health.set_scaled(data.max_hp, data.armor, hp_scale * 3.0)
+	dmg_mult = 2.0
+	xp_mult = 10.0
+	gold_mult = 5.0
+	_mesh.scale *= 1.3
+	# Golden tint for elite identity
+	_mat.albedo_color = Color(1.0, 0.8, 0.2)
+	elite = $EliteComponent
+	elite.setup(self, _player, get_parent().get_parent().get_enemy_manager() if get_parent().get_parent().has_method("get_enemy_manager") else get_parent().get_parent(), p_abilities)
 
 func _physics_process(delta: float) -> void:
 	if not _alive or _player == null or not is_instance_valid(_player):
@@ -96,7 +127,9 @@ func _physics_process(delta: float) -> void:
 	if dist <= data.attack_range * 1.5 and _attack_timer <= 0.0:
 		_attack_timer = data.attack_cooldown
 		if _player.has_method("take_contact_damage"):
-			_player.take_contact_damage(data.damage * dmg_scale, global_position)
+			_player.take_contact_damage(data.damage * dmg_scale * dmg_mult, global_position)
+			if elite != null:
+				elite.on_hit_player()
 
 func get_health_ratio() -> float:
 	return health.get_ratio()
@@ -108,6 +141,8 @@ func _on_died() -> void:
 	if not _alive:
 		return
 	_alive = false
+	if elite != null:
+		elite.on_death()
 	EventBus.enemy_died.emit(self, global_position)
 	died.emit(self)
 

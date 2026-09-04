@@ -50,6 +50,9 @@ func _ready() -> void:
 	# HUD
 	$HUD/Hud.bind_player(player)
 
+	# Boss death → back to PLAYING state
+	EventBus.boss_died.connect(_on_boss_died)
+
 	if DisplayServer.is_touchscreen_available():
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		touch_controls.visible = true
@@ -61,6 +64,11 @@ func _ready() -> void:
 
 func get_enemy_manager() -> Node:
 	return enemy_manager
+
+func _on_boss_died() -> void:
+	RunManager.set_boss_active(false)
+	if GameManager.state == GameManager.State.BOSS:
+		GameManager.change_state(GameManager.State.PLAYING)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if InputManager.is_pause_just_pressed():

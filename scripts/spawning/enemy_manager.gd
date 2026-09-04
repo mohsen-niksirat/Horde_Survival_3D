@@ -9,9 +9,12 @@ const ENEMY_SCENE := "res://scenes/enemies/Enemy.tscn"
 
 var active_enemies: Array = []
 var _spawn_queue: Array = []
+var arena_ref: Node3D = null
+var player_ref: Node3D = null
 
 ## Queue a spawn (deferred to next frame to keep spawner cheap).
-func queue_spawn(data: EnemyData, position: Vector3, player: Node3D, hp_scale: float, dmg_scale: float, spd_scale: float) -> void:
+## elite: optional Array of ability ids.
+func queue_spawn(data: EnemyData, position: Vector3, player: Node3D, hp_scale: float, dmg_scale: float, spd_scale: float, elite: Array = []) -> void:
 	_spawn_queue.append({
 		"data": data,
 		"position": position,
@@ -19,6 +22,7 @@ func queue_spawn(data: EnemyData, position: Vector3, player: Node3D, hp_scale: f
 		"hp": hp_scale,
 		"dmg": dmg_scale,
 		"spd": spd_scale,
+		"elite": elite,
 	})
 
 func _process(_delta: float) -> void:
@@ -35,10 +39,29 @@ func _spawn_now(req: Dictionary) -> void:
 	get_parent().add_child(enemy)
 	enemy.global_position = req["position"]
 	enemy.setup(req["data"], req["player"], req["hp"], req["dmg"], req["spd"])
-	enemy.died.connect(_on_enemy_died.bind(enemy))
+	# Elite promotion
+	if req.get("elite", []):
+		enemy.make_elite(req["elite"])
+		enemy.elite.request_minions.connect(_on_minions_requested)
+	if not enemy.died.is_connected(_on_enemy_died):
+		enemy.died.connect(_on_enemy_died.bind(enemy))
 	active_enemies.append(enemy)
 	PerformanceManager.active_enemies = active_enemies.size()
 	enemy_registered.emit(enemy)
+
+func _on_minions_requested(count: int, position: Vector3) -> void:
+	var drone: EnemyData = archetype("swarm_bat")
+	if drone == null:
+		return
+	for i in range(count):
+		var offset := Vector3(randf_range(-2, 2), 0, randf_range(-2, 2))
+		queue_spawn(drone, position + offset, player_ref, 1.0, 1.0, 1.0)
+
+func archetype(id: String) -> EnemyData:
+	var path := "res://data/enemies/%s.tres" % id
+	if ResourceLoader.exists(path):
+		return load(path)
+	return null
 
 func _on_enemy_died(_enemy: Node, enemy: Node) -> void:
 	release_enemy(enemy)

@@ -3,6 +3,8 @@ extends Node
 ## Owns SpawnManager duties (this is small enough to stay one system until
 ## modes require separate spawn strategies).
 
+const EliteAbilityC := preload("res://scripts/enemies/elite_ability.gd")
+
 const CULL_DISTANCE := 75.0
 
 var arena: Node3D
@@ -12,11 +14,17 @@ var enemy_manager: Node
 var archetype_data: Dictionary = {}
 var _spawn_timer: float = 0.0
 var _active: bool = false
+var _last_elite_level: int = 0
+var _boss_spawned: bool = false
+const BOSS_TIME := 300.0
+const BOSS_SCENE := "res://scenes/bosses/Boss.tscn"
 
 func setup(p_arena: Node3D, p_player: Node3D, p_enemy_manager: Node) -> void:
 	arena = p_arena
 	player = p_player
 	enemy_manager = p_enemy_manager
+	enemy_manager.arena_ref = arena
+	enemy_manager.player_ref = player
 	_load_archetypes()
 	_active = true
 
@@ -41,7 +49,56 @@ func _process(delta: float) -> void:
 		_spawn_timer = DifficultyManager.spawn_interval(minutes)
 		_spawn_wave(minutes)
 
+	_tick_boss()
+	_tick_elites()
 	_cull_far_enemies()
+
+## Milestone boss at BOSS_TIME seconds (5 min MVP).
+func _tick_boss() -> void:
+	if _boss_spawned:
+		return
+	if RunManager.elapsed_time >= BOSS_TIME:
+		_boss_spawned = true
+		_spawn_boss()
+
+func _spawn_boss() -> void:
+	var boss_scene: PackedScene = load(BOSS_SCENE)
+	var boss := boss_scene.instantiate()
+	get_parent().add_child(boss)
+	var angle := randf() * TAU
+	var pos := player.global_position + Vector3(cos(angle), 0, sin(angle)) * 20.0
+	pos.x = clampf(pos.x, -55, 55)
+	pos.z = clampf(pos.z, -55, 55)
+	boss.global_position = Vector3(pos.x, 0.5, pos.z)
+	boss.setup(player, enemy_manager, arena, DifficultyManager.hp_scale(DifficultyManager.difficulty_multiplier(player.experience.level, RunManager.elapsed_time / 60.0)) * 0.4)
+	RunManager.set_boss_active(true)
+	GameManager.change_state(GameManager.State.BOSS)
+	EventBus.boss_spawned.emit(boss)
+
+## Elite every 10 player levels (reference-game cadence).
+func _tick_elites() -> void:
+	var level: int = player.experience.level
+	if DifficultyManager.should_spawn_elite(level, _last_elite_level):
+		_last_elite_level = int(level / 10) * 10
+		_spawn_elite()
+
+func _spawn_elite() -> void:
+	var cap: int = PerformanceManager.enemy_cap()
+	if enemy_manager.enemy_count() >= cap:
+		return
+	var data: EnemyData = _pick_archetype(DifficultyManager.allowed_archetypes(RunManager.elapsed_time / 60.0))
+	if data == null:
+		return
+	var minutes := RunManager.elapsed_time / 60.0
+	var difficulty := DifficultyManager.difficulty_multiplier(player.experience.level, minutes)
+	var abilities: Array = []
+	var pool: Array = EliteAbilityC.ALL.duplicate()
+	pool.shuffle()
+	abilities.append(pool[0])
+	if randf() < 0.4:
+		abilities.append(pool[1])
+	var pos: Vector3 = arena.get_spawn_position(player.global_position)
+	enemy_manager.queue_spawn(data, pos, player, DifficultyManager.hp_scale(difficulty), DifficultyManager.damage_scale(difficulty), DifficultyManager.speed_scale(difficulty), abilities)
 
 func _spawn_wave(minutes: float) -> void:
 	# Population control first
