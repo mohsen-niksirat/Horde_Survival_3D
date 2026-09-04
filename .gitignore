@@ -1,0 +1,17 @@
+# Godot 4
+.godot/
+*.tmp
+export_presets.cfg.secret
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Build outputs
+build/
+dist/
+*.tmp
+
+# Reference clones (local only)
+.reference/
