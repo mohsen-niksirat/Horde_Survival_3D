@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3 uid="uid://abil_meteor001"]
+
+[ext_resource type="Script" path="res://scripts/abilities/ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "meteor_strike"
+display_name = "Meteor Strike"
+description = "Devastating AOE blast on the nearest enemy"
+cooldown = 25.0
+damage = 80.0
+area = 6.0
+duration = 0.0
+status_effect = "burn"
+input_action = "ability_1"

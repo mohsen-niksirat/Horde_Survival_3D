@@ -4,9 +4,21 @@ extends Node
 ## in steady state — nodes are recycled.
 
 var _pools: Dictionary = {}
+var _release_queue: Array = []
+var _pending_release: Dictionary = {}  # instance_id -> true (dedupe)
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+
+func _process(_delta: float) -> void:
+	# Deferred release: safe during physics callbacks
+	if _release_queue.is_empty():
+		return
+	var queue := _release_queue
+	_release_queue = []
+	_pending_release.clear()
+	for item in queue:
+		_release_now(item[0], item[1])
 
 ## Create (or get) a pool for a scene with an initial prewarm size.
 func create_pool(scene_path: String, prewarm: int = 0) -> void:
@@ -42,16 +54,25 @@ func acquire(scene_path: String) -> Node:
 	pool["active_count"] += 1
 	return node
 
-## Release an instance back to its pool. Removes from parent.
+## Release an instance back to its pool. Deferred: safe in physics callbacks.
 func release(node: Node) -> void:
 	if node == null or not is_instance_valid(node):
 		return
+	if _pending_release.has(node.get_instance_id()):
+		return  # already queued (double-release guard)
 	var scene_path: String = node.get_meta("pool_scene", "")
 	if scene_path == "" or not _pools.has(scene_path):
 		node.queue_free()
 		return
+	_pending_release[node.get_instance_id()] = true
+	_release_queue.append([scene_path, node])
+
+func _release_now(scene_path: String, node: Node) -> void:
+	if not is_instance_valid(node) or not _pools.has(scene_path):
+		return
 	var pool: Dictionary = _pools[scene_path]
-	node.get_parent().remove_child(node)
+	if node.get_parent() != null:
+		node.get_parent().remove_child(node)
 	node.visible = false
 	pool["free"].append(node)
 	pool["active_count"] -= 1

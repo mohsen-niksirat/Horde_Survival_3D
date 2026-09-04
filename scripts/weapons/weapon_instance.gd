@@ -7,6 +7,7 @@ signal fired()
 
 var data: WeaponData
 var level: int = 1
+var evolved: bool = false
 var _cooldown_left: float = 0.0
 
 var _combat_context: Node = null  # set by WeaponController

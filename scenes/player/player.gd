@@ -13,6 +13,9 @@ const CONTACT_INVINCIBILITY := 0.5
 
 var stat_block: StatBlock
 var progression: Node = null  # set by Main
+var combo: Node = null        # set by Main
+var ability_controller: Node = null  # set by Main
+var has_revive: bool = false
 
 var _face_yaw: float = 0.0
 var _bob_time: float = 0.0
@@ -53,7 +56,7 @@ func on_stats_changed() -> void:
 	movement.base_speed = stat_block.get_stat("move_speed")
 
 func _on_xp_collected(amount: float) -> void:
-	experience.add_xp(amount)
+	experience.add_xp(amount * stat_block.get_stat("xp_gain"))
 
 func _physics_process(delta: float) -> void:
 	if not health.is_alive():
@@ -99,9 +102,12 @@ func take_contact_damage(amount: float, from_position: Vector3) -> void:
 
 func _on_enemy_died(enemy: Node, position: Vector3) -> void:
 	RunManager.register_kill()
-	_drop_xp(enemy, position)
+	var xp_mult: float = 1.0
+	if combo != null:
+		xp_mult = combo.get_multiplier()
+	_drop_xp(enemy, position, xp_mult)
 
-func _drop_xp(enemy: Node, position: Vector3) -> void:
+func _drop_xp(enemy: Node, position: Vector3, xp_mult: float = 1.0) -> void:
 	var data: EnemyData = enemy.data
 	if data == null:
 		return
@@ -111,9 +117,9 @@ func _drop_xp(enemy: Node, position: Vector3) -> void:
 		orb_count = 3
 	elif data.xp >= 3.0:
 		orb_count = 2
-	var per_orb: float = data.xp / orb_count
+	var per_orb: float = data.xp * xp_mult / orb_count
 	for i in range(orb_count):
-		var orb := PoolManager.acquire(orb_scene)
+		var orb: Node3D = PoolManager.acquire(orb_scene)
 		PoolManager.tag(orb, orb_scene)
 		get_parent().add_child(orb)
 		orb.setup(per_orb, self, position)
@@ -124,8 +130,17 @@ func _on_leveled_up(new_level: int) -> void:
 		progression.offer_choices()
 
 func _on_died() -> void:
+	if has_revive:
+		has_revive = false
+		health.reset()
+		health.set_invincible(2.0)
+		camera_rig.add_shake(0.3)
+		return
 	EventBus.player_died.emit()
 	GameManager.game_over(false)
+
+func grant_revive() -> void:
+	has_revive = true
 
 func is_player_alive() -> bool:
 	return health.is_alive()

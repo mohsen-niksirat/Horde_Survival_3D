@@ -2,7 +2,7 @@ class_name UpgradeOption
 extends RefCounted
 ## One choice card on the level-up screen.
 
-enum Kind { NEW_WEAPON, WEAPON_TIER, PASSIVE, HEAL }
+enum Kind { NEW_WEAPON, WEAPON_TIER, PASSIVE, HEAL, EVOLVE }
 
 var kind: int = Kind.HEAL
 var title: String = ""

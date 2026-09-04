@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3 uid="uid://wdata_hellfire1"]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "hellfire"
+display_name = "Hellfire"
+type = "projectile"
+base_damage = 60.0
+base_cooldown = 1.4
+projectile_count = 1
+projectile_speed = 18.0
+area = 3.2
+pierce = 0
+crit_chance = 0.1
+crit_mult = 2.0
+max_range = 30.0
+homing = false
+status_effect = "burn"
+status_duration = 3.0
+status_damage = 15.0
+projectile_scene = "res://scenes/weapons/FireballProjectile.tscn"

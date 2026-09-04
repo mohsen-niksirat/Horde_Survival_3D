@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic_crown01"]
+
+[ext_resource type="Script" path="res://scripts/items/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "crown"
+display_name = "Crown of Wisdom"
+rarity = "common"
+description = "+25% XP gain"
+modifiers = [{"stat": "xp_gain", "flat": 0.0, "percent": 0.25}]
+special = ""

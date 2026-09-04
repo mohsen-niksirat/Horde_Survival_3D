@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=2 format=3 uid="uid://abil_freeze001"]
+
+[ext_resource type="Script" path="res://scripts/abilities/ability_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "time_freeze"
+display_name = "Time Freeze"
+description = "Freeze all enemies for 3 seconds"
+cooldown = 30.0
+damage = 0.0
+area = 0.0
+duration = 3.0
+status_effect = "freeze"
+input_action = "ability_2"

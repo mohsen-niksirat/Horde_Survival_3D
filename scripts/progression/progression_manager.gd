@@ -15,6 +15,8 @@ var player: CharacterBody3D
 var passive_levels: Dictionary = {}   # passive_id -> level
 var passive_data: Dictionary = {}     # passive_id -> PassiveData
 var pending_levels: int = 0
+var evolutions: Array = []
+var evolved_ids: Array = []
 
 func setup(p_player: CharacterBody3D) -> void:
 	player = p_player
@@ -22,6 +24,10 @@ func setup(p_player: CharacterBody3D) -> void:
 		var path := "res://data/passives/%s.tres" % id
 		if ResourceLoader.exists(path):
 			passive_data[id] = load(path)
+	# Load evolution recipes
+	for evo_path in ["res://data/weapons/evo_hellfire.tres", "res://data/weapons/evo_holy_bible.tres"]:
+		if ResourceLoader.exists(evo_path):
+			evolutions.append(load(evo_path))
 
 ## Called when the player levels up. Queues the level and shows choices;
 ## stacked multi-level ups wait until the current pick is made.
@@ -70,6 +76,17 @@ func _fill_pool(pool: Array) -> void:
 	var weapon_controller: Node = player.weapon_controller
 	var weapons: Array = weapon_controller.weapons
 
+	# Evolutions (LEGENDARY priority — added first so they surface often)
+	var evo: EvolutionData = EvolutionData.is_available(evolutions, weapon_controller, passive_levels)
+	if evo != null and not evolved_ids.has(evo.id):
+		var opt := UpgradeOption.new()
+		opt.kind = UpgradeOption.Kind.EVOLVE
+		opt.rarity = "legendary"
+		opt.title = "EVOLVE: %s" % evo.display_name
+		opt.description = "Transform your %s into %s!" % [_weapon_name(evo.base_weapon_id), evo.display_name]
+		opt.target = evo
+		pool.append(opt)
+
 	# Weapon tier-ups
 	for w in weapons:
 		if w.level < 5:
@@ -117,6 +134,14 @@ func _make_heal_option() -> UpgradeOption:
 ## Apply the chosen option.
 func apply_choice(option: UpgradeOption) -> void:
 	match option.kind:
+		UpgradeOption.Kind.EVOLVE:
+			var evo: EvolutionData = option.target
+			for w in player.weapon_controller.weapons:
+				if w.data.id == evo.base_weapon_id:
+					w.data = evo.evolved_weapon
+					w.evolved = true
+					break
+			evolved_ids.append(evo.id)
 		UpgradeOption.Kind.WEAPON_TIER:
 			for w in player.weapon_controller.weapons:
 				if w.data == option.target:
@@ -130,3 +155,9 @@ func apply_choice(option: UpgradeOption) -> void:
 		UpgradeOption.Kind.HEAL:
 			player.health.heal(player.health.max_hp * 0.3)
 	EventBus.upgrade_applied.emit(option.title)
+
+func _weapon_name(id: String) -> String:
+	for w in player.weapon_controller.weapons:
+		if w.data.id == id:
+			return w.data.display_name
+	return id

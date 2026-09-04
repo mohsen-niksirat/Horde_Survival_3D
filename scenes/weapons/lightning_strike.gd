@@ -10,21 +10,22 @@ var _active: bool = false
 func _ready() -> void:
 	visible = false
 
-func trigger(weapon: WeaponInstance, target_pos: Vector3, enemy_manager: Node, player: Node3D) -> void:
+## weapon_like: WeaponInstance or AbilityData — needs get_damage/get_area/get_crit_chance
+func trigger(weapon_like, target_pos: Vector3, enemy_manager: Node, player: Node3D) -> void:
 	global_position = target_pos
 	_life = 0.0
 	_active = true
 	visible = true
 
 	# AOE damage in the strike area
-	var radius: float = weapon.get_area()
+	var radius: float = weapon_like.get_area()
 	var hits: Array = enemy_manager.get_enemies_in_radius(global_position, radius)
 	var might: float = 1.0
 	if player.has_method("get_stat"):
 		might = player.get_stat("might")
 	for enemy in hits:
-		var is_crit: bool = randf() < weapon.get_crit_chance()
-		var event := DamageEvent.new(weapon.get_damage() * might * (2.0 if is_crit else 1.0), "lightning", is_crit)
+		var is_crit: bool = randf() < weapon_like.get_crit_chance()
+		var event := DamageEvent.new(weapon_like.get_damage() * might * (2.0 if is_crit else 1.0), "lightning", is_crit)
 		enemy.health.take_damage(event)
 		EventBus.enemy_damaged.emit(enemy, event.final_amount, is_crit)
 

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic_wings01"]
+
+[ext_resource type="Script" path="res://scripts/items/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "wings"
+display_name = "Swift Wings"
+rarity = "common"
+description = "+20% move speed"
+modifiers = [{"stat": "move_speed", "flat": 0.0, "percent": 0.2}]
+special = ""

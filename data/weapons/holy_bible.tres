@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3 uid="uid://wdata_bible001"]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "holy_bible"
+display_name = "Holy Bible"
+type = "projectile"
+base_damage = 24.0
+base_cooldown = 0.6
+projectile_count = 3
+projectile_speed = 22.0
+area = 0.5
+pierce = 1
+crit_chance = 0.05
+crit_mult = 2.0
+max_range = 28.0
+homing = true
+status_effect = ""
+status_duration = 0.0
+status_damage = 0.0
+projectile_scene = "res://scenes/weapons/MagicMissileProjectile.tscn"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic_clover1"]
+
+[ext_resource type="Script" path="res://scripts/items/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "clover"
+display_name = "Golden Clover"
+rarity = "uncommon"
+description = "+15% luck"
+modifiers = [{"stat": "luck", "flat": 0.0, "percent": 0.15}]
+special = ""

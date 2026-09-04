@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://relicpick0001"]
+
+[ext_resource type="Script" path="res://scenes/pickups/relic_pickup.gd" id="1"]
+
+[sub_resource type="BoxShape3D" id="shape"]
+size=Vector3(1.2, 1.4, 1.2)
+
+[sub_resource type="PrismMesh" id="mesh"]
+left_to_right=0.5
+size=Vector3(0.5, 0.7, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="mat"]
+emission_enabled=true
+emission_energy_multiplier=1.5
+
+[node name="RelicPickup" type="Area3D"]
+collision_layer=8
+collision_mask=1
+script=ExtResource("1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape=SubResource("shape")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+mesh=SubResource("mesh")
+surface_material_override/0=SubResource("mat")

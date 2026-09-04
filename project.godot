@@ -1,15 +1,23 @@
 ; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
 ; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
 config/name="HordeSurvival 3D"
 config/description="A stylized third-person survival roguelite. Survive the horde, auto-attack, level up, evolve weapons."
 run/main_scene="res://scenes/bootstrap/Boot.tscn"
-config/features=PackedStringArray("4.3")
+config/features=PackedStringArray("4.7")
 boot_splash/bg_color=Color(0.101961, 0.109804, 0.14902, 1)
 boot_splash/show_image=false
 config/icon="res://assets/ui/icon.svg"
@@ -114,6 +122,6 @@ dash={
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
-anti_aliasing/quality/msaa_3d=1
 lights_and_shadows/directional_shadow/size=2048
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=1
+anti_aliasing/quality/msaa_3d=1

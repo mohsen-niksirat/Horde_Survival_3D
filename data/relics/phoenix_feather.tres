@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3 uid="uid://relic_phoenix1"]
+
+[ext_resource type="Script" path="res://scripts/items/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "phoenix_feather"
+display_name = "Phoenix Feather"
+rarity = "legendary"
+description = "Revive once at 50% HP"
+modifiers = []
+special = "revive_once"

@@ -1,10 +1,14 @@
 extends Node3D
-## Root game orchestrator: owns per-run systems (enemy manager, progression),
-## global input routing, mouse capture, and the debug overlay.
+## Root game orchestrator: owns per-run systems (enemy manager, progression,
+## relics, combo, achievements, abilities, pet), global input routing,
+## mouse capture, and the debug overlay.
 
 const ENEMY_MANAGER := preload("res://scripts/spawning/enemy_manager.gd")
 const WAVE_MANAGER := preload("res://scripts/spawning/wave_manager.gd")
 const PROGRESSION := preload("res://scripts/progression/progression_manager.gd")
+const RELIC_SYSTEM := preload("res://scripts/items/relic_system.gd")
+const COMBO_MANAGER := preload("res://scripts/progression/combo_manager.gd")
+const ACHIEVEMENT_SYSTEM := preload("res://scripts/progression/achievement_system.gd")
 
 @onready var player: CharacterBody3D = $World/Player
 @onready var touch_controls: Control = $HUD/TouchControls
@@ -13,6 +17,9 @@ const PROGRESSION := preload("res://scripts/progression/progression_manager.gd")
 var enemy_manager: Node
 var wave_manager: Node
 var progression: Node
+var relic_system: Node
+var combo_manager: Node
+var ability_controller: Node
 var projectile_root: Node3D
 var _debug_enabled: bool = false
 
@@ -31,14 +38,14 @@ func _ready() -> void:
 	add_child(projectile_root)
 	player.bind_combat(enemy_manager, projectile_root)
 
-	# Horde spawning (Phase 5)
+	# Horde spawning
 	wave_manager = Node.new()
 	wave_manager.set_script(WAVE_MANAGER)
 	wave_manager.name = "WaveManager"
 	add_child(wave_manager)
 	wave_manager.setup($World, player, enemy_manager)
 
-	# Progression + level-up UI (Phase 6)
+	# Progression + level-up UI
 	progression = Node.new()
 	progression.set_script(PROGRESSION)
 	progression.name = "ProgressionManager"
@@ -47,8 +54,43 @@ func _ready() -> void:
 	player.progression = progression
 	$HUD/LevelUpOverlay.bind_progression(progression)
 
-	# HUD
+	# Combo (drives XP multiplier)
+	combo_manager = Node.new()
+	combo_manager.set_script(COMBO_MANAGER)
+	combo_manager.name = "ComboManager"
+	add_child(combo_manager)
+	player.combo = combo_manager
+
+	# Achievements
+	var achievements := Node.new()
+	achievements.set_script(ACHIEVEMENT_SYSTEM)
+	achievements.name = "AchievementSystem"
+	add_child(achievements)
+
+	# Relics
+	relic_system = Node.new()
+	relic_system.set_script(RELIC_SYSTEM)
+	relic_system.name = "RelicSystem"
+	add_child(relic_system)
+	relic_system.setup(player, $World, projectile_root)
+
+	# Abilities
+	ability_controller = Node.new()
+	ability_controller.set_script(preload("res://scripts/abilities/ability_controller.gd"))
+	ability_controller.name = "AbilityController"
+	add_child(ability_controller)
+	ability_controller.setup(player, enemy_manager, projectile_root)
+	player.ability_controller = ability_controller
+
+	# Pet (Dragon Welp)
+	var pet_scene: PackedScene = load("res://scenes/player/Pet.tscn")
+	var pet := pet_scene.instantiate()
+	add_child(pet)
+	pet.setup(player, enemy_manager, projectile_root)
+
+	# UI bindings
 	$HUD/Hud.bind_player(player)
+	$HUD/Hud.bind_abilities(ability_controller)
 
 	# Boss death → back to PLAYING state
 	EventBus.boss_died.connect(_on_boss_died)

@@ -24,7 +24,7 @@ func setup(p_value: float, p_player: Node3D, spawn_pos: Vector3) -> void:
 	_settled = false
 	_vertical_velocity = randf_range(2.5, 5.0)
 	global_position = spawn_pos + Vector3(randf_range(-0.6, 0.6), 0.6, randf_range(-0.6, 0.6))
-	monitoring = true
+	set_deferred("monitoring", true)
 
 func _process(delta: float) -> void:
 	if _player == null or not is_instance_valid(_player):
@@ -58,4 +58,5 @@ func _process(delta: float) -> void:
 func _on_body_entered(body: Node3D) -> void:
 	if body.is_in_group("player"):
 		EventBus.xp_collected.emit(value)
+		set_deferred("monitoring", false)
 		PoolManager.release(self)
