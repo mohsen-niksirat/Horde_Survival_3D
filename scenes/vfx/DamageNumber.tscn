@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://dmgnum0000001"]
+
+[ext_resource type="Script" path="res://scenes/vfx/damage_number.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="pad_mat"]
+transparency=1
+albedo_color=Color(0, 0, 0, 0.35)
+
+[node name="DamageNumber" type="Node3D"]
+script=ExtResource("1")
+
+[node name="Label" type="Label3D" parent="."]
+billboard=1
+no_depth_test=true
+font_size=34
+outline_size=8
+pixel_size=0.004
+text="0"

@@ -100,6 +100,13 @@ func _ready() -> void:
 	add_child(sfx_binder)
 	AudioManager.apply_saved_volumes()
 
+	# Combat juice: 3D damage numbers, kill bursts, level-up ring (V5)
+	var juice := Node.new()
+	juice.set_script(preload("res://scripts/combat/juice_manager.gd"))
+	juice.name = "JuiceManager"
+	add_child(juice)
+	juice.setup(player)
+
 	# Boss death → back to PLAYING state
 	EventBus.boss_died.connect(_on_boss_died)
 
