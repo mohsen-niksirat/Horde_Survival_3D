@@ -6,7 +6,8 @@ const CONTACT_INVINCIBILITY := 0.5
 
 @onready var movement: Node = $MovementComponent
 @onready var camera_rig: Node3D = $CameraRig
-@onready var mesh: MeshInstance3D = $Mesh
+@onready var mesh: Node3D = $Mesh
+@onready var hero: Node3D = $Mesh/HeroModel
 @onready var health: Node = $HealthComponent
 @onready var experience: Node = $ExperienceComponent
 @onready var weapon_controller: Node = $WeaponController
@@ -18,15 +19,12 @@ var ability_controller: Node = null  # set by Main
 var has_revive: bool = false
 
 var _face_yaw: float = 0.0
-var _bob_time: float = 0.0
-var _base_mesh_y: float = 0.0
 var _base_hp: float = 100.0
 
 func _ready() -> void:
 	add_to_group("player")
 	stat_block = StatBlock.new({"max_hp": _base_hp, "move_speed": 6.0, "pickup_radius": 3.0})
 	movement.setup(self)
-	_base_mesh_y = mesh.position.y
 	_face_yaw = rotation.y
 	camera_rig.set_target(self)
 	health.setup(_base_hp)
@@ -74,14 +72,7 @@ func _physics_process(delta: float) -> void:
 	rotation.y = _face_yaw
 
 	var speed: float = movement.get_current_speed()
-	if speed > 0.5:
-		_bob_time += delta * speed * 1.6
-		mesh.position.y = _base_mesh_y + absf(sin(_bob_time)) * 0.08
-		mesh.rotation.x = lerpf(mesh.rotation.x, 0.08, 6.0 * delta)
-	else:
-		_bob_time = 0.0
-		mesh.position.y = lerpf(mesh.position.y, _base_mesh_y, 8.0 * delta)
-		mesh.rotation.x = lerpf(mesh.rotation.x, 0.0, 8.0 * delta)
+	hero.animate(delta, speed)
 
 ## Called by enemies on contact attacks.
 func take_contact_damage(amount: float, from_position: Vector3) -> void:

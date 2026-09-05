@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://player00000001"]
+[gd_scene load_steps=22 format=3 uid="uid://player00000001"]
 
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/player/movement_component.gd" id="2"]
@@ -6,26 +6,72 @@
 [ext_resource type="Script" path="res://scripts/combat/health_component.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/player/experience_component.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/weapons/weapon_controller.gd" id="6"]
+[ext_resource type="Script" path="res://scenes/player/hero_model.gd" id="7"]
 
 [sub_resource type="CapsuleShape3D" id="capsule"]
 radius=0.45
 height=1.8
 
-[sub_resource type="CapsuleMesh" id="capsule_mesh"]
-radius=0.45
-height=1.8
+[sub_resource type="StandardMaterial3D" id="robe_mat"]
+albedo_color=Color(0.243, 0.298, 0.478, 1)
+roughness=0.8
 
-[sub_resource type="StandardMaterial3D" id="body_mat"]
+[sub_resource type="StandardMaterial3D" id="hood_mat"]
+albedo_color=Color(0.18, 0.22, 0.37, 1)
+roughness=0.8
+
+[sub_resource type="StandardMaterial3D" id="trim_mat"]
 albedo_color=Color(0.854902, 0.647059, 0.258824, 1)
-roughness=0.6
+metallic=0.3
+roughness=0.5
 
-[sub_resource type="SphereMesh" id="head_mesh"]
-radius=0.28
-height=0.56
-
-[sub_resource type="StandardMaterial3D" id="head_mat"]
+[sub_resource type="StandardMaterial3D" id="skin_mat"]
 albedo_color=Color(0.956863, 0.8, 0.639216, 1)
 roughness=0.7
+
+[sub_resource type="StandardMaterial3D" id="wood_mat"]
+albedo_color=Color(0.4, 0.28, 0.18, 1)
+roughness=0.9
+
+[sub_resource type="StandardMaterial3D" id="orb_mat"]
+albedo_color=Color(0.4, 0.85, 1, 1)
+emission_enabled=true
+emission=Color(0.35, 0.8, 1, 1)
+emission_energy_multiplier=2.2
+
+[sub_resource type="CylinderMesh" id="robe_mesh"]
+top_radius=0.3
+bottom_radius=0.55
+height=1.1
+
+[sub_resource type="CapsuleMesh" id="torso_mesh"]
+radius=0.26
+height=0.7
+
+[sub_resource type="SphereMesh" id="head_mesh"]
+radius=0.2
+height=0.4
+
+[sub_resource type="SphereMesh" id="hood_mesh"]
+radius=0.27
+height=0.54
+
+[sub_resource type="SphereMesh" id="shoulder_mesh"]
+radius=0.14
+height=0.28
+
+[sub_resource type="CylinderMesh" id="pole_mesh"]
+top_radius=0.035
+bottom_radius=0.035
+height=1.6
+
+[sub_resource type="SphereMesh" id="orb_mesh"]
+radius=0.12
+height=0.24
+
+[sub_resource type="TorusMesh" id="belt_mesh"]
+inner_radius=0.28
+outer_radius=0.34
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer=1
@@ -36,15 +82,59 @@ script=ExtResource("1")
 transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape=SubResource("capsule")
 
-[node name="Mesh" type="MeshInstance3D" parent="."]
-transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh=SubResource("capsule_mesh")
-surface_material_override/0=SubResource("body_mat")
+[node name="Mesh" type="Node3D" parent="."]
 
-[node name="Head" type="MeshInstance3D" parent="Mesh"]
-transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+[node name="Root" type="Node3D" parent="Mesh"]
+
+[node name="Robe" type="MeshInstance3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+mesh=SubResource("robe_mesh")
+surface_material_override/0=SubResource("robe_mat")
+
+[node name="Torso" type="MeshInstance3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+mesh=SubResource("torso_mesh")
+surface_material_override/0=SubResource("robe_mat")
+
+[node name="Head" type="MeshInstance3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 mesh=SubResource("head_mesh")
-surface_material_override/0=SubResource("head_mat")
+surface_material_override/0=SubResource("skin_mat")
+
+[node name="Hood" type="MeshInstance3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 0.9, 0, 0, 0, 1.05, 0, 1.58, 0.02)
+mesh=SubResource("hood_mesh")
+surface_material_override/0=SubResource("hood_mat")
+
+[node name="ShoulderL" type="MeshInstance3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, 1.36, 0)
+mesh=SubResource("shoulder_mesh")
+surface_material_override/0=SubResource("trim_mat")
+
+[node name="ShoulderR" type="MeshInstance3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 1.36, 0)
+mesh=SubResource("shoulder_mesh")
+surface_material_override/0=SubResource("trim_mat")
+
+[node name="Belt" type="MeshInstance3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.92, 0)
+mesh=SubResource("belt_mesh")
+surface_material_override/0=SubResource("trim_mat")
+
+[node name="Staff" type="Node3D" parent="Mesh/Root"]
+transform=Transform3D(1, 0, 0, 0, 0.955336, 0.29552, 0, -0.29552, 0.955336, 0.38, 0.95, 0.08)
+
+[node name="Pole" type="MeshInstance3D" parent="Mesh/Root/Staff"]
+mesh=SubResource("pole_mesh")
+surface_material_override/0=SubResource("wood_mat")
+
+[node name="Orb" type="MeshInstance3D" parent="Mesh/Root/Staff"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.82, 0)
+mesh=SubResource("orb_mesh")
+surface_material_override/0=SubResource("orb_mat")
+
+[node name="HeroModel" type="Node3D" parent="Mesh"]
+script=ExtResource("7")
 
 [node name="MovementComponent" type="Node" parent="."]
 script=ExtResource("2")
@@ -62,7 +152,6 @@ script=ExtResource("6")
 transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
 script=ExtResource("3")
 target_path=NodePath("..")
-distance=8.0
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraRig"]
 spring_length=8.0
