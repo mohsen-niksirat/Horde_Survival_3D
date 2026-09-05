@@ -37,13 +37,16 @@ func _input(event: InputEvent) -> void:
 
 func _handle_touch(event: InputEventScreenTouch) -> void:
 	if event.pressed:
-		if _joy_touch_index == -1 and event.position.x < get_viewport_rect().size.x * 0.45:
+		var half := get_viewport_rect().size.x * 0.5
+		if _joy_touch_index == -1 and event.position.x < half:
+			# CoD-style: joystick spawns wherever the left half is touched
 			_joy_touch_index = event.index
 			_joy_center = event.position
 			_joy_current = event.position
 			joystick_base.position = _joy_center - joystick_base.size * 0.5
 			joystick_base.modulate.a = 0.7
-		elif _look_touch_index == -1:
+		elif _look_touch_index == -1 and event.position.x >= half:
+			# Right half = camera look only
 			_look_touch_index = event.index
 			_look_last = event.position
 			_look_current = event.position

@@ -19,3 +19,5 @@ dist/
 # Local tools / personal files
 Godot_*.exe
 prompt*.txt
+
+.freebuff/

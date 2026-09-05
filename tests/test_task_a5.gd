@@ -48,20 +48,21 @@ func _initialize() -> void:
 	_check(d1 > d0 and d2 > d1 and d2 - d1 < d1 - d0 + 0.5, "zoom eases smoothly (%.2f -> %.2f -> %.2f)" % [d0, d1, d2])
 
 	# --- Mouse wheel event routes through _unhandled_input ---
-	for i in range(120):
+	for i in range(150):
 		await process_frame
 		await physics_frame
 	var len_before: float = arm.spring_length
-	var ev := InputEventMouseButton.new()
-	ev.button_index = MOUSE_BUTTON_WHEEL_UP
-	ev.pressed = true
-	Input.parse_input_event(ev)
-	await process_frame
-	await physics_frame
+	for w in range(3):
+		var ev := InputEventMouseButton.new()
+		ev.button_index = MOUSE_BUTTON_WHEEL_UP
+		ev.pressed = true
+		Input.parse_input_event(ev)
+		await process_frame
+		await physics_frame
 	var len_wheel: float = arm.spring_length
 	# Wheel-up decreases zoom target: distance must shrink relative to
-	# where it had settled.
-	_check(len_wheel < len_before, "mouse wheel zooms in (%.2f < %.2f)" % [len_wheel, len_before])
+	# where it had settled (allow easing noise).
+	_check(len_wheel < len_before - 0.05, "mouse wheel zooms in (%.2f < %.2f)" % [len_wheel, len_before])
 
 	# --- Camera collision arm intact (margin set) ---
 	_check(arm.margin > 0.0, "spring arm collision margin set (%.2f)" % arm.margin)

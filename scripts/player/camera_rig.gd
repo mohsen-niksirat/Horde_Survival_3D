@@ -46,11 +46,10 @@ func set_target(target: Node3D) -> void:
 		global_position = _target.global_position + Vector3(0, height, 0)
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Desktop look: move mouse while holding RIGHT button (drag-look), or
-	# captured mode if a future mode needs it. Keeping the cursor visible
-	# keeps HUD buttons (pause) always clickable.
-	var dragging := Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
-	if event is InputEventMouseMotion and (dragging or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED):
+	# Desktop look: plain mouse movement rotates the camera (CoD-style,
+	# no aiming in this game so no pointer lock). Touch look arrives via
+	# InputManager; wheel zoom handled here.
+	if event is InputEventMouseMotion:
 		_yaw -= event.relative.x * yaw_sensitivity
 		_pitch -= event.relative.y * pitch_sensitivity
 		_pitch = clampf(_pitch, deg_to_rad(pitch_min_deg), deg_to_rad(pitch_max_deg))
