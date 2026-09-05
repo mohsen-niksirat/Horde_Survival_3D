@@ -1,12 +1,19 @@
 extends Node3D
 ## Arena environment script. Holds spawn-point helpers used by spawning
-## systems (Phase 5+).
+## systems (Phase 5+) and instantiates the V4 decoration layer.
 
+const DECOR_SCRIPT := preload("res://scenes/world/arena_decor.gd")
 const HALF_SIZE := 60.0
 ## Spawn ring: close enough that spawned enemies are on/near screen
 ## (camera sees ~25-35m ahead), far enough to avoid pop-in in the face.
 const SPAWN_RING_MIN := 22.0
 const SPAWN_RING_MAX := 30.0
+
+func _ready() -> void:
+	var decor := Node3D.new()
+	decor.name = "ArenaDecor"
+	decor.set_script(DECOR_SCRIPT)
+	add_child(decor)
 
 ## Returns a random spawn position on a ring around a center point,
 ## clamped inside the arena.
