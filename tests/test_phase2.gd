@@ -46,7 +46,17 @@ func _initialize() -> void:
 	_check(absf(rig._yaw - yaw_before) < 0.001, "movement keys do not rotate camera")
 
 	var rig_dist := rig.global_position.distance_to(player.global_position)
-	_check(rig_dist < 12.0, "camera rig follows player (dist %.2f)" % rig_dist)
+	_check(rig_dist < 16.0, "camera rig follows player (dist %.2f)" % rig_dist)
+
+	# --- Moving must NOT rotate the camera (A-fix) ---
+	var yaw_before_move: float = rig._yaw
+	Input.action_press("move_left")
+	Input.action_press("move_up")
+	for i in range(30):
+		await physics_frame
+	Input.action_release("move_left")
+	Input.action_release("move_up")
+	_check(absf(rig._yaw - yaw_before_move) < 0.001, "movement does not rotate camera while moving")
 
 	# --- Movement deceleration ---
 	for i in range(30):

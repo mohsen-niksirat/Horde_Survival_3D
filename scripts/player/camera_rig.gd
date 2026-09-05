@@ -31,6 +31,9 @@ var _shake_decay: float = 6.0
 @onready var _camera: Camera3D = $SpringArm3D/Camera3D
 
 func _ready() -> void:
+	# Detach from the player's transform: the character body rotates to face
+	# its movement direction — the camera must NOT inherit that rotation.
+	top_level = true
 	_pitch = deg_to_rad(default_pitch_deg)
 	_zoom = clampf(default_zoom, 0.0, 1.0)
 	_current_distance = _target_distance()
@@ -66,8 +69,8 @@ func _process(delta: float) -> void:
 	if _target == null:
 		return
 
-	# Touch look (virtual joystick side provides camera drag on mobile)
-	var look := InputManager.get_look_delta()
+	# Touch look — consumed so each drag delta applies exactly once
+	var look := InputManager.consume_look_delta()
 	if look.length_squared() > 0.01:
 		_yaw -= look.x * yaw_sensitivity
 		_pitch -= look.y * pitch_sensitivity
@@ -82,15 +85,8 @@ func _process(delta: float) -> void:
 	var goal := _target.global_position + Vector3(0, height, 0)
 	global_position = global_position.lerp(goal, 1.0 - exp(-position_smoothing * delta))
 
-	# Distance from zoom slider + gentle dynamic offset when moving
-	var moving := false
-	if _target is CharacterBody3D:
-		var v: Vector3 = _target.velocity
-		moving = Vector2(v.x, v.z).length() > 1.0
-	var target_dist := _target_distance()
-	if moving and _zoom < 0.55:
-		target_dist = lerpf(min_distance, max_distance, minf(_zoom + 0.1, 1.0))
-	_current_distance = lerpf(_current_distance, target_dist, 1.0 - exp(-zoom_speed * delta))
+	# Camera distance changes ONLY from user zoom input — nothing else
+	_current_distance = lerpf(_current_distance, _target_distance(), 1.0 - exp(-zoom_speed * delta))
 	_spring_arm.spring_length = _current_distance
 
 	# Apply orbit
