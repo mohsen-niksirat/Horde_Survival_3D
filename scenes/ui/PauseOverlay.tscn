@@ -46,7 +46,7 @@ horizontal_alignment=1
 layout_mode=2
 theme_override_font_sizes/font_size=14
 theme_override_colors/font_color=Color(0.6, 0.65, 0.75, 1)
-text="Press Esc to resume"
+text="Esc or P to resume"
 horizontal_alignment=1
 
 [node name="ResumeButton" type="Button" parent="Center/Panel/Layout"]
@@ -54,6 +54,12 @@ custom_minimum_size=Vector2(240, 46)
 layout_mode=2
 theme_override_font_sizes/font_size=20
 text="RESUME"
+
+[node name="RestartButton" type="Button" parent="Center/Panel/Layout"]
+custom_minimum_size=Vector2(240, 42)
+layout_mode=2
+theme_override_font_sizes/font_size=16
+text="RESTART"
 
 [node name="MenuButton" type="Button" parent="Center/Panel/Layout"]
 custom_minimum_size=Vector2(240, 40)
