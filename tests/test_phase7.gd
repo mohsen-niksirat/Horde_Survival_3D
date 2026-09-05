@@ -66,6 +66,9 @@ func _initialize() -> void:
 
 	# --- Spear pierce: hits multiple enemies in a line ---
 	em.clear_all()
+	_purge_projectiles(main)
+	await process_frame
+	await process_frame
 	var drone2: EnemyData = load("res://data/enemies/basic_drone.tres")
 	for offset in [Vector3(8, 0, 0), Vector3(11, 0, 0), Vector3(14, 0, 0)]:
 		em.queue_spawn(drone2, player.global_position + offset, player, 1.0, 1.0, 1.0)
@@ -90,6 +93,18 @@ func _initialize() -> void:
 	# --- Lightning AOE strike (auto-fire disabled for determinism) ---
 	wc.weapons.clear()
 	em.clear_all()
+	_purge_projectiles(main)
+	await process_frame
+	await process_frame
+	# Return lingering projectiles to their pools (queue_free would corrupt
+	# the pool: later releases would hit freed instances).
+	var proj_root: Node3D = main.get_node_or_null("Projectiles")
+	var pm := root.get_node("PoolManager")
+	if proj_root != null:
+		for proj in proj_root.get_children():
+			if proj.has_meta("pool_scene"):
+				pm.release(proj)
+			# Untagged nodes (lightning VFX) manage themselves — leave them.
 	for offset in [Vector3(0, 0, 4), Vector3(2, 0, 4), Vector3(-2, 0, 4)]:
 		em.queue_spawn(drone2, player.global_position + offset, player, 1.0, 1.0, 1.0)
 	for i in range(4):
@@ -162,3 +177,12 @@ func _check(cond: bool, label: String) -> void:
 	else:
 		push_error("FAIL: " + label)
 		failures += 1
+
+func _purge_projectiles(main: Node) -> void:
+	var proj_root: Node3D = main.get_node_or_null("Projectiles")
+	var pm := root.get_node("PoolManager")
+	if proj_root == null:
+		return
+	for proj in proj_root.get_children():
+		if proj.has_meta("pool_scene"):
+			pm.release(proj)

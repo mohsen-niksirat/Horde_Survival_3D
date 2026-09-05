@@ -70,7 +70,11 @@ func release(node: Node) -> void:
 	_release_queue.append([scene_path, node])
 
 func _release_now(scene_path: String, node: Node) -> void:
-	if not is_instance_valid(node) or not _pools.has(scene_path):
+	if not _pools.has(scene_path):
+		return
+	if not is_instance_valid(node):
+		# Node was freed elsewhere (e.g. queue_free) while queued for
+		# release — drop it instead of corrupting the pool.
 		return
 	var pool: Dictionary = _pools[scene_path]
 	if node.get_parent() != null:
