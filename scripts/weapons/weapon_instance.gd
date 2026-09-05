@@ -29,7 +29,9 @@ func tick(delta: float, player: Node3D, enemies: Node) -> void:
 		_cooldown_left = 0.1
 		return
 
-	var target: Node3D = TargetingSystem.nearest(player.global_position, candidates, data.max_range)
+	# Prefer enemies in front of the camera (what the player can see).
+	var cam: Camera3D = player.get_viewport().get_camera_3d()
+	var target: Node3D = TargetingSystem.nearest_visible(player.global_position, candidates, data.max_range, cam)
 	if target == null:
 		_cooldown_left = 0.1
 		return

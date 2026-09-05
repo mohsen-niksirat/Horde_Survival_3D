@@ -5,7 +5,9 @@ extends Node
 
 const EliteAbilityC := preload("res://scripts/enemies/elite_ability.gd")
 
-const CULL_DISTANCE := 75.0
+## Auto-aim weapons ignore enemies beyond this range even if data says
+## otherwise — keeps targeting to what the player can actually see.
+const TARGETABLE_RANGE_CAP := 32.0
 
 var arena: Node3D
 var player: Node3D
@@ -52,7 +54,6 @@ func _process(delta: float) -> void:
 
 	_tick_boss()
 	_tick_elites()
-	_cull_far_enemies()
 	PerformanceManager.report_system_time("waves", Time.get_ticks_usec() - start)
 
 ## Milestone boss at BOSS_TIME seconds (5 min MVP).
@@ -149,10 +150,3 @@ func _pick_archetype(allowed: Array) -> EnemyData:
 		if roll <= 0.0:
 			return data
 	return pool[0]
-
-func _cull_far_enemies() -> void:
-	# Recycle enemies too far from the player (arena is bounded anyway).
-	var cull2 := CULL_DISTANCE * CULL_DISTANCE
-	for enemy in enemy_manager.active_enemies.duplicate():
-		if is_instance_valid(enemy) and enemy.global_position.distance_squared_to(player.global_position) > cull2:
-			enemy_manager.release_enemy(enemy)

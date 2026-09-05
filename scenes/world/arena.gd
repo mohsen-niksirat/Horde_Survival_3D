@@ -3,8 +3,10 @@ extends Node3D
 ## systems (Phase 5+).
 
 const HALF_SIZE := 60.0
-const SPAWN_RING_MIN := 35.0
-const SPAWN_RING_MAX := 45.0
+## Spawn ring: close enough that spawned enemies are on/near screen
+## (camera sees ~25-35m ahead), far enough to avoid pop-in in the face.
+const SPAWN_RING_MIN := 22.0
+const SPAWN_RING_MAX := 30.0
 
 ## Returns a random spawn position on a ring around a center point,
 ## clamped inside the arena.

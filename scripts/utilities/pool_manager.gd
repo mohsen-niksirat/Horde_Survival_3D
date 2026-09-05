@@ -51,6 +51,8 @@ func acquire(scene_path: String) -> Node:
 		node = _instantiate(pool)
 	else:
 		node = pool["free"].pop_back()
+	# Released nodes were hidden — restore visibility for their new life.
+	node.visible = true
 	pool["active_count"] += 1
 	return node
 

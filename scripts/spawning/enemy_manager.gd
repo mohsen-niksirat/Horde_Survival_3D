@@ -11,6 +11,8 @@ var active_enemies: Array = []
 var _spawn_queue: Array = []
 var arena_ref: Node3D = null
 var player_ref: Node3D = null
+## Enemies beyond this distance from the player are recycled.
+const CULL_DISTANCE := 55.0
 
 ## Queue a spawn (deferred to next frame to keep spawner cheap).
 ## elite: optional Array of ability ids.
@@ -27,11 +29,24 @@ func queue_spawn(data: EnemyData, position: Vector3, player: Node3D, hp_scale: f
 
 func _process(_delta: float) -> void:
 	if _spawn_queue.is_empty():
+		# Still run culling even without spawns pending
+		_cull_far_enemies()
 		return
 	var queue := _spawn_queue
 	_spawn_queue = []
 	for req in queue:
 		_spawn_now(req)
+	_cull_far_enemies()
+
+## Recycle enemies too far from the player — they would otherwise attack
+## from off-screen invisibly.
+func _cull_far_enemies() -> void:
+	if player_ref == null:
+		return
+	var cull2 := CULL_DISTANCE * CULL_DISTANCE
+	for enemy in active_enemies.duplicate():
+		if is_instance_valid(enemy) and enemy.global_position.distance_squared_to(player_ref.global_position) > cull2:
+			release_enemy(enemy)
 
 func _spawn_now(req: Dictionary) -> void:
 	var enemy := PoolManager.acquire(ENEMY_SCENE)

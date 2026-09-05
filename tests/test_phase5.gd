@@ -56,12 +56,18 @@ func _initialize() -> void:
 	_check(em.enemy_count() <= perf.enemy_cap(), "enemy cap holds (%d <= %d)" % [em.enemy_count(), perf.enemy_cap()])
 
 	# --- Culling: stop waves, teleport player+enemy far apart ---
+	# A level-up during the soak pauses the tree (LEVEL_UP state); clear
+	# that pause so EnemyManager._process (which runs culling) ticks.
+	game_manager.state = game_manager.State.PLAYING
+	paused = false
+	player.experience.xp_to_next = 999999.0
 	wm.stop()
 	player.global_position = Vector3(0, 0.5, 0)
 	player.velocity = Vector3.ZERO
 	if em.enemy_count() > 0:
 		var far: CharacterBody3D = em.active_enemies[0]
-		far.global_position = Vector3(0, 0, 74)  # > 75m from player
+		far.set_physics_process(false)  # freeze it so it cannot chase closer
+		far.global_position = Vector3(0, 0, 200)  # far beyond the 55m cull
 		var before: int = em.enemy_count()
 		for i in range(120):
 			await process_frame
