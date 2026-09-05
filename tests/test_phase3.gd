@@ -53,9 +53,12 @@ func _initialize() -> void:
 	_check(player.health.current_hp < 100.0, "player took contact damage (hp=%.1f)" % player.health.current_hp)
 
 	# --- Kill the enemy: XP orbs drop ---
-	player.global_position = Vector3(0, 0.5, 0)
+	# Teleport the player to the enemy first so dropped orbs are in
+	# magnet range (deterministic pickup).
+	player.global_position = enemy.global_position + Vector3(0, 0.5, 0)
 	var run_manager := root.get_node("RunManager")
 	var kills_before: int = run_manager.kills
+	var xp_before: float = player.experience.current_xp
 	# Direct damage via health component
 	var dmg := DamageEvent.new(9999.0, "test")
 	enemy.health.take_damage(dmg)
@@ -71,8 +74,7 @@ func _initialize() -> void:
 			orbs += 1
 	_check(orbs >= 1, "xp orbs dropped (%d)" % orbs)
 
-	# --- XP collection: place player on orbs ---
-	var xp_before: float = player.experience.current_xp
+	# --- XP collection: orbs were dropped under the player ---
 	for i in range(60):
 		await physics_frame
 		if player.experience.current_xp > xp_before:
