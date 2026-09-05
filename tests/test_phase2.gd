@@ -31,6 +31,20 @@ func _initialize() -> void:
 	var moved_x: float = player.global_position.x
 	_check(moved_x > 1.0, "player moved +X (got %.2f)" % moved_x)
 
+	# --- Arrow keys must NOT move or rotate anything (A2 fix) ---
+	_check(not InputMap.has_action("camera_left"), "no camera_left action")
+	_check(not InputMap.has_action("camera_right"), "no camera_right action")
+	_check(not InputMap.has_action("camera_up"), "no camera_up action")
+	_check(not InputMap.has_action("camera_down"), "no camera_down action")
+	var yaw_before: float = rig._yaw
+	Input.action_press("move_left")
+	Input.action_press("move_up")
+	for i in range(30):
+		await physics_frame
+	Input.action_release("move_left")
+	Input.action_release("move_up")
+	_check(absf(rig._yaw - yaw_before) < 0.001, "movement keys do not rotate camera")
+
 	var rig_dist := rig.global_position.distance_to(player.global_position)
 	_check(rig_dist < 12.0, "camera rig follows player (dist %.2f)" % rig_dist)
 
