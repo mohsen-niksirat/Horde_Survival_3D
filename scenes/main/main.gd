@@ -107,12 +107,25 @@ func _ready() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		touch_controls.visible = true
 	else:
-		# Desktop: keep the cursor visible (no aiming in this game) —
-		# camera look is right-mouse drag; HUD stays clickable.
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		touch_controls.visible = false
+	_apply_mouse_mode(GameManager.state)
+	# Release/capture the cursor as game states change (menus/level-up need
+	# a visible cursor; gameplay locks it for unbounded camera rotation).
+	EventBus.game_state_changed.connect(_on_game_state_changed_for_mouse)
 
 	debug_label.visible = false
+
+func _on_game_state_changed_for_mouse(new_state: int, _old: int) -> void:
+	_apply_mouse_mode(new_state)
+
+func _apply_mouse_mode(state: int) -> void:
+	if DisplayServer.is_touchscreen_available():
+		return
+	match state:
+		GameManager.State.PLAYING, GameManager.State.BOSS:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		_:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func get_enemy_manager() -> Node:
 	return enemy_manager
@@ -134,12 +147,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 	if event is InputEventMouseButton and event.pressed:
-		# Left-click on empty space keeps focus for keyboard input on web.
-		pass
+		# Click-to-recapture: web pointer lock can be exited by the browser
+		# (Esc); re-lock on the next click during active gameplay.
+		if not DisplayServer.is_touchscreen_available():
+			if GameManager.state == GameManager.State.PLAYING and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+				_apply_mouse_mode(GameManager.State.PLAYING)
 
 func _toggle_pause() -> void:
 	if GameManager.state == GameManager.State.PLAYING or GameManager.state == GameManager.State.BOSS:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		GameManager.pause_game()
 	elif GameManager.state == GameManager.State.PAUSED:
 		GameManager.resume_game()
