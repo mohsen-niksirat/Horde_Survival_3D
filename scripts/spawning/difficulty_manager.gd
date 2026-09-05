@@ -30,10 +30,18 @@ static func allowed_archetypes(minutes: float) -> Array:
 		out.append("swarm_bat")
 	if minutes >= 2.5:
 		out.append("fast_wisp")
+	if minutes >= 3.5:
+		out.append("ghost")
 	if minutes >= 4.0:
 		out.append("shooter_turret")
 	if minutes >= 5.0:
 		out.append("tank_golem")
+	if minutes >= 6.0:
+		out.append("splitter")
+	if minutes >= 7.0:
+		out.append("mage")
+	if minutes >= 8.0:
+		out.append("healer")
 	return out
 
 ## Elite cadence: every 10 player levels (matches reference game).

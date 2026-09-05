@@ -31,7 +31,7 @@ func setup(p_arena: Node3D, p_player: Node3D, p_enemy_manager: Node) -> void:
 	_active = true
 
 func _load_archetypes() -> void:
-	for id in ["basic_drone", "fast_wisp", "tank_golem", "swarm_bat", "shooter_turret"]:
+	for id in ["basic_drone", "fast_wisp", "tank_golem", "swarm_bat", "shooter_turret", "ghost", "splitter", "healer", "mage"]:
 		var path := "res://data/enemies/%s.tres" % id
 		if ResourceLoader.exists(path):
 			archetype_data[id] = load(path)

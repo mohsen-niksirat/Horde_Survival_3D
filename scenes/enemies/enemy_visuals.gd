@@ -17,6 +17,11 @@ static func build(visual_root: Node3D, archetype_id: String) -> void:
 		"tank_golem": _build_golem(visual_root)
 		"shooter_turret": _build_turret(visual_root)
 		"swarm_bat": _build_bat(visual_root)
+		"ghost": _build_ghost(visual_root)
+		"splitter": _build_splitter(visual_root)
+		"healer": _build_healer(visual_root)
+		"mage": _build_mage(visual_root)
+		"swarm_bat_mini": _build_bat(visual_root)
 		_: _build_drone(visual_root)
 
 static func clear(visual_root: Node3D) -> void:
@@ -199,3 +204,87 @@ static func animate(visual_root: Node3D, archetype_id: String, time: float, seed
 			for child in visual_root.get_children():
 				if child is Node3D and child.has_meta("base_y"):
 					child.position.y = child.get_meta("base_y") + sin(time * 5.0 + seed_val) * 0.03
+
+# --- Ghost: translucent pale wisp, hollow eyes ---
+static func _build_ghost(v: Node3D) -> void:
+	var pale := _mat(Color(0.75, 0.85, 0.95, 0.55))
+	pale.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var eye := _mat(Color(0.1, 0.2, 0.4, 1))
+	var body := SphereMesh.new()
+	body.radius = 0.42
+	body.height = 0.84
+	_mesh(v, body, pale, Vector3(0, 0.7, 0))
+	var tail := SphereMesh.new()
+	tail.radius = 0.3
+	tail.height = 0.6
+	var tail_mi := _mesh(v, tail, pale, Vector3(0, 0.25, 0))
+	tail_mi.scale = Vector3(0.7, 1.0, 0.7)
+	var e := SphereMesh.new()
+	e.radius = 0.06
+	e.height = 0.12
+	_mesh(v, e, eye, Vector3(-0.12, 0.78, -0.34))
+	_mesh(v, e, eye, Vector3(0.12, 0.78, -0.34))
+
+# --- Splitter: wobbling blob with two inner lobes ---
+static func _build_splitter(v: Node3D) -> void:
+	var gel := _mat(Color(0.4, 0.8, 0.55, 0.85))
+	gel.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var inner := _mat(Color(0.25, 0.6, 0.4, 0.9))
+	inner.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var blob := SphereMesh.new()
+	blob.radius = 0.55
+	blob.height = 1.1
+	_mesh(v, blob, gel, Vector3(0, 0.6, 0))
+	var lobe := SphereMesh.new()
+	lobe.radius = 0.22
+	lobe.height = 0.44
+	_mesh(v, lobe, inner, Vector3(-0.2, 0.55, 0))
+	_mesh(v, lobe, inner, Vector3(0.2, 0.55, 0))
+
+# --- Healer: white robed figure with pulsing staff sigil ---
+static func _build_healer(v: Node3D) -> void:
+	var cloth := _mat(Color(0.92, 0.92, 0.88))
+	var sigil := _mat(Color(0.4, 1.0, 0.5), 1.8)
+	var robe := CylinderMesh.new()
+	robe.top_radius = 0.22
+	robe.bottom_radius = 0.42
+	robe.height = 1.0
+	_mesh(v, robe, cloth, Vector3(0, 0.5, 0))
+	var head := SphereMesh.new()
+	head.radius = 0.18
+	head.height = 0.36
+	_mesh(v, head, cloth, Vector3(0, 1.12, 0))
+	var sig := SphereMesh.new()
+	sig.radius = 0.12
+	sig.height = 0.24
+	_mesh(v, sig, sigil, Vector3(0.3, 0.95, 0.1))
+
+# --- Mage: dark robe, wide hat, glowing staff orb ---
+static func _build_mage(v: Node3D) -> void:
+	var robe_m := _mat(Color(0.35, 0.25, 0.5))
+	var hat_m := _mat(Color(0.28, 0.18, 0.42))
+	var orb_m := _mat(Color(0.8, 0.5, 1.0), 2.0)
+	var robe := CylinderMesh.new()
+	robe.top_radius = 0.24
+	robe.bottom_radius = 0.5
+	robe.height = 1.05
+	_mesh(v, robe, robe_m, Vector3(0, 0.52, 0))
+	var hat := CylinderMesh.new()
+	hat.top_radius = 0.02
+	hat.bottom_radius = 0.4
+	hat.height = 0.45
+	_mesh(v, hat, hat_m, Vector3(0, 1.45, 0))
+	var brim := CylinderMesh.new()
+	brim.top_radius = 0.4
+	brim.bottom_radius = 0.4
+	brim.height = 0.05
+	_mesh(v, brim, hat_m, Vector3(0, 1.24, 0))
+	var staff := CylinderMesh.new()
+	staff.top_radius = 0.03
+	staff.bottom_radius = 0.03
+	staff.height = 1.3
+	_mesh(v, staff, hat_m, Vector3(0.34, 0.85, 0.05))
+	var orb := SphereMesh.new()
+	orb.radius = 0.11
+	orb.height = 0.22
+	_mesh(v, orb, orb_m, Vector3(0.34, 1.5, 0.05))

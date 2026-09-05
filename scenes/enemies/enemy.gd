@@ -26,6 +26,10 @@ var _wobble_seed: float = 0.0
 var _alive: bool = false
 var _mesh: Node3D
 var _flash_materials: Array = []
+var _ranged_timer: float = 2.0
+var _heal_timer: float = 2.0
+var _phase_timer: float = 0.0
+var _split_done: bool = false
 
 func _ready() -> void:
 	add_to_group("enemies")
@@ -44,11 +48,15 @@ func _on_damaged(event: DamageEvent) -> void:
 
 func _hit_flash() -> void:
 	# Flash all archetype part materials white briefly
+	var was_phasing := _is_phasing()
 	for mi in _flash_materials:
 		if is_instance_valid(mi):
 			mi.albedo_color = Color(3, 3, 3)
+			var restore: Color = mi.get_meta("base_color")
+			if was_phasing:
+				restore.a = 0.35
 			var tween := create_tween()
-			tween.tween_property(mi, "albedo_color", mi.get_meta("base_color"), 0.12)
+			tween.tween_property(mi, "albedo_color", restore, 0.12)
 
 func setup(p_data: EnemyData, p_player: Node3D, p_hp_scale: float, p_dmg_scale: float, p_spd_scale: float) -> void:
 	data = p_data
@@ -75,6 +83,10 @@ func setup(p_data: EnemyData, p_player: Node3D, p_hp_scale: float, p_dmg_scale: 
 	_mesh.scale = Vector3(s, s, s)
 
 	_attack_timer = randf_range(0.0, data.attack_cooldown)
+	_ranged_timer = randf_range(0.5, data.ranged_cooldown if data.ranged_attack else 2.5)
+	_heal_timer = data.heal_cooldown
+	_phase_timer = data.phase_interval
+	_split_done = false
 	_alive = true
 
 ## Cache the part materials for hit flashes; elites get a gold tint.
@@ -132,6 +144,15 @@ func _physics_process(delta: float) -> void:
 				dir = (dir + sway * sin(Time.get_ticks_msec() / 1000.0 * 3.0 + _wobble_seed) * 0.3).normalized()
 			"stationary":
 				dir = Vector3.ZERO
+			"kite":
+				# Keep mid range: flee when close, approach when far
+				if dist < 10.0:
+					dir = -dir
+				elif dist > 16.0:
+					pass  # keep approaching
+				else:
+					var strafe := Vector3.UP.cross(dir).normalized()
+					dir = strafe * (1.0 if _wobble_seed > PI else -1.0)
 
 		var speed: float = data.move_speed * spd_scale * status.get_speed_factor()
 		velocity.x = dir.x * speed
@@ -149,10 +170,66 @@ func _physics_process(delta: float) -> void:
 			_player.take_contact_damage(data.damage * dmg_scale * dmg_mult, global_position)
 			if elite != null:
 				elite.on_hit_player()
+
+	# Ranged volley (mage archetype)
+	if data.ranged_attack:
+		_ranged_timer -= delta
+		if _ranged_timer <= 0.0 and dist < 18.0:
+			_ranged_timer = data.ranged_cooldown
+			_fire_volley()
+
+	# Healer aura
+	if data.heal_radius > 0.0:
+		_heal_timer -= delta
+		if _heal_timer <= 0.0:
+			_heal_timer = data.heal_cooldown
+			_heal_allies()
+
+	# Ghost phasing
+	if data.phase_interval > 0.0:
+		_phase_timer -= delta
+		if _phase_timer <= -data.phase_duration:
+			_phase_timer = data.phase_interval
+	_set_phasing_alpha(_is_phasing())
 	# Aggregate AI time into the performance overlay (cheap u64 add)
 	PerformanceManager.report_system_time("enemy_ai", Time.get_ticks_usec() - _start)
 	# Archetype micro-animation (wings, hover, flame pulse)
 	EnemyVisuals.animate(_mesh, data.id, Time.get_ticks_msec() / 1000.0, _wobble_seed)
+
+## Ghost phasing: periodically untargetable.
+func _is_phasing() -> bool:
+	return data.phase_interval > 0.0 and _phase_timer <= 0.0
+
+## Visual shimmer: dial part material alphas while phasing.
+func _set_phasing_alpha(phasing: bool) -> void:
+	var target_a := 0.35 if phasing else 1.0
+	for mi in _flash_materials:
+		if is_instance_valid(mi):
+			var c: Color = mi.get_meta("base_color")
+			c.a = target_a
+			mi.albedo_color = c
+
+func _fire_volley() -> void:
+	var proj := PoolManager.acquire("res://scenes/weapons/BossProjectile.tscn")
+	PoolManager.tag(proj, "res://scenes/weapons/BossProjectile.tscn")
+	# Attach under the Projectiles container when available for tidy stats
+	var container: Node = get_parent()
+	var proj_container: Node3D = container.get_node_or_null("Projectiles")
+	if proj_container != null:
+		proj_container.add_child(proj)
+	else:
+		container.add_child(proj)
+	var dir := (_player.global_position - global_position).normalized()
+	proj.setup(global_position + Vector3(0, 1.0, 0), dir, data.ranged_damage * dmg_scale, _player)
+
+func _heal_allies() -> void:
+	var em: Node = get_tree().get_first_node_in_group("enemy_manager")
+	if em == null:
+		return
+	for ally in em.active_enemies:
+		if is_instance_valid(ally) and ally != self and ally.health.is_alive():
+			if ally.global_position.distance_to(global_position) <= data.heal_radius:
+				ally.health.heal(ally.health.max_hp * data.heal_pct)
 
 func get_health_ratio() -> float:
 	return health.get_ratio()
@@ -166,6 +243,16 @@ func _on_died() -> void:
 	_alive = false
 	if elite != null:
 		elite.on_death()
+	# Splitter behavior: leave copies behind (pooled, once per life)
+	if data != null and data.splits_into != "" and not _split_done:
+		_split_done = true
+		var child_data: EnemyData = load("res://data/enemies/%s.tres" % data.splits_into)
+		if child_data != null:
+			for i in range(data.split_count):
+				var offset := Vector3(randf_range(-1.5, 1.5), 0, randf_range(-1.5, 1.5))
+				var em: Node = get_tree().get_first_node_in_group("enemy_manager")
+				if em != null:
+					em.queue_spawn(child_data, global_position + offset, _player, hp_scale * 0.5, dmg_scale, spd_scale)
 	EventBus.enemy_died.emit(self, global_position)
 	died.emit(self)
 	# Death shrink effect happens while the pooled node leaves the tree

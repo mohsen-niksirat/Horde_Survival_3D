@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://endata_split01"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "splitter"
+display_name = "Splitter"
+color = Color(0.4, 0.8, 0.55, 1)
+scale = 1.1
+max_hp = 35.0
+damage = 9.0
+move_speed = 2.6
+armor = 0.0
+movement_type = "chase"
+attack_range = 1.5
+attack_cooldown = 1.0
+xp = 5.0
+gold = 2.0
+spawn_weight = 3.0
+threat_cost = 3.0
+splits_into = "swarm_bat"
+split_count = 2

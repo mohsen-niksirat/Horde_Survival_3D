@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://endata_healer1"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "healer"
+display_name = "Healer"
+color = Color(0.92, 0.92, 0.88, 1)
+scale = 1.0
+max_hp = 40.0
+damage = 4.0
+move_speed = 2.4
+armor = 0.0
+movement_type = "chase"
+attack_range = 1.4
+attack_cooldown = 1.2
+xp = 8.0
+gold = 3.0
+spawn_weight = 2.0
+threat_cost = 4.0
+heal_radius = 6.0
+heal_pct = 0.03
+heal_cooldown = 2.0

@@ -27,6 +27,9 @@ func queue_spawn(data: EnemyData, position: Vector3, player: Node3D, hp_scale: f
 		"elite": elite,
 	})
 
+func _ready() -> void:
+	add_to_group("enemy_manager")
+
 func _process(_delta: float) -> void:
 	if _spawn_queue.is_empty():
 		# Still run culling even without spawns pending

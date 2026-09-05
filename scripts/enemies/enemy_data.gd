@@ -18,6 +18,20 @@ extends Resource
 @export_enum("chase", "wobble", "sine", "stationary", "kite") var movement_type: String = "chase"
 @export var attack_range: float = 1.6
 @export var attack_cooldown: float = 1.0
+## Ghost-like phasing: periodic untargetable windows.
+@export var phase_interval: float = 0.0   # 0 = never phases
+@export var phase_duration: float = 1.0
+## Splitter: spawn copies of this archetype id on death.
+@export var splits_into: String = ""
+@export var split_count: int = 0
+## Healer: heals nearby allies (radius > 0 enables it).
+@export var heal_radius: float = 0.0
+@export var heal_pct: float = 0.0
+@export var heal_cooldown: float = 2.0
+## Mage-like ranged attack: fires boss projectiles at the player.
+@export var ranged_attack: bool = false
+@export var ranged_cooldown: float = 2.5
+@export var ranged_damage: float = 10.0
 
 @export_group("Rewards")
 @export var xp: float = 1.0

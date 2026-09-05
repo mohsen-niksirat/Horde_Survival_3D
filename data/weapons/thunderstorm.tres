@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3 uid="uid://wdata_thunder1"]
+
+[ext_resource type="Script" path="res://scripts/weapons/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "thunderstorm"
+display_name = "Thunderstorm"
+type = "aoe"
+base_damage = 35.0
+base_cooldown = 1.0
+projectile_count = 2
+projectile_speed = 0.0
+area = 4.5
+pierce = 0
+crit_chance = 0.1
+crit_mult = 2.0
+max_range = 26.0
+homing = false
+status_effect = ""
+status_duration = 0.0
+status_damage = 0.0
+projectile_scene = "res://scenes/weapons/LightningStrike.tscn"

@@ -59,6 +59,11 @@ func add_weapon(weapon_data: WeaponData) -> void:
 	inst.setup(weapon_data, self)
 	weapons.append(inst)
 	if weapon_data.type == "orbit":
+		# Recreate the orbit container if it was freed (restart/cleanup)
+		if _orbit_root == null or not is_instance_valid(_orbit_root) or not _orbit_root.is_inside_tree():
+			_orbit_root = Node3D.new()
+			_orbit_root.name = "OrbitRoot"
+			_player.add_child(_orbit_root)
 		var orbit := Node3D.new()
 		orbit.name = "Orbiting_%s" % weapon_data.id
 		orbit.set_script(load("res://scenes/weapons/orbiting_shield_weapon.gd"))

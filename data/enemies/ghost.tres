@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://endata_ghost01"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ghost"
+display_name = "Ghost"
+color = Color(0.75, 0.85, 0.95, 1)
+scale = 1.0
+max_hp = 18.0
+damage = 10.0
+move_speed = 3.2
+armor = 0.0
+movement_type = "sine"
+attack_range = 1.4
+attack_cooldown = 0.9
+xp = 6.0
+gold = 2.0
+spawn_weight = 4.0
+threat_cost = 3.0
+phase_interval = 4.0
+phase_duration = 1.2
