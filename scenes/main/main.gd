@@ -147,3 +147,4 @@ func _toggle_pause() -> void:
 func _process(_delta: float) -> void:
 	if _debug_enabled:
 		debug_label.text = PerformanceManager.get_debug_info()
+		debug_label.size.y = 0  # let multi-line text size itself

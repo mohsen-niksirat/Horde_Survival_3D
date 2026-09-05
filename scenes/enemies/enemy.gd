@@ -93,6 +93,7 @@ func make_elite(p_abilities: Array) -> void:
 func _physics_process(delta: float) -> void:
 	if not _alive or _player == null or not is_instance_valid(_player):
 		return
+	var _start := Time.get_ticks_usec()
 
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
@@ -130,6 +131,8 @@ func _physics_process(delta: float) -> void:
 			_player.take_contact_damage(data.damage * dmg_scale * dmg_mult, global_position)
 			if elite != null:
 				elite.on_hit_player()
+	# Aggregate AI time into the performance overlay (cheap u64 add)
+	PerformanceManager.report_system_time("enemy_ai", Time.get_ticks_usec() - _start)
 
 func get_health_ratio() -> float:
 	return health.get_ratio()

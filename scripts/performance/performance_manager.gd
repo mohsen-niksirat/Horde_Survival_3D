@@ -1,6 +1,7 @@
 extends Node
-## Performance budgets and quality tiers. Owns entity/particle caps and
-## dynamic degradation decisions.
+## Performance budgets and quality tiers. Owns entity/particle caps,
+## dynamic degradation decisions, and the profiling stats shown in the
+## F3 debug overlay.
 
 signal quality_changed(tier: int)
 
@@ -18,6 +19,10 @@ var quality: int = Quality.MEDIUM
 var active_enemies: int = 0
 var active_projectiles: int = 0
 var active_particles: int = 0
+
+## Per-system frame-time rolling stats (milliseconds, ~10-frame average).
+## Systems report via report_system_time() in their own _process.
+var _system_times: Dictionary = {}   # name -> {total_usec, frames}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -42,11 +47,47 @@ func particle_cap() -> int:
 func damage_number_cap() -> int:
 	return DAMAGE_NUMBER_CAPS[quality]
 
-## Debug overlay data (Phase 10/11 will render this).
+## Add one frame's elapsed microseconds for a named system.
+## Call report_system_time(name, end - start) once per _process tick.
+func report_system_time(name: String, elapsed_usec: int) -> void:
+	if not _system_times.has(name):
+		_system_times[name] = {"total": 0, "frames": 0}
+	var stat: Dictionary = _system_times[name]
+	stat["total"] += elapsed_usec
+	stat["frames"] += 1
+	# Rolling window: reset every ~10 frames to keep the average recent
+	if stat["frames"] >= 10:
+		stat["total"] = int(stat["total"] / float(stat["frames"]))
+		stat["frames"] = 1
+
+func get_system_avg_ms(name: String) -> float:
+	if not _system_times.has(name):
+		return 0.0
+	var stat: Dictionary = _system_times[name]
+	if stat["frames"] == 0:
+		return 0.0
+	return stat["total"] / float(stat["frames"]) / 1000.0
+
+## Debug overlay data (multi-line; F3 toggles it).
 func get_debug_info() -> String:
-	return "FPS: %d | Enemies: %d | Projectiles: %d | Particles: %d" % [
+	var lines: Array[String] = []
+	lines.append("FPS: %d | frame: %.2f ms | physics: %.2f ms" % [
 		Engine.get_frames_per_second(),
-		active_enemies,
-		active_projectiles,
-		active_particles,
-	]
+		Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+		Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
+	])
+	lines.append("draw calls: %d | primitives: %dk | objects: %d " % [
+		Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+		int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME) / 1000.0),
+		Performance.get_monitor(Performance.OBJECT_COUNT),
+	])
+	lines.append("enemies: %d | projectiles: %d | particles: %d" % [
+		active_enemies, active_projectiles, active_particles,
+	])
+	# Per-system averages (only reported ones)
+	var sys_lines: Array[String] = []
+	for name in _system_times:
+		sys_lines.append("%s: %.2f ms" % [name, get_system_avg_ms(name)])
+	if not sys_lines.is_empty():
+		lines.append(" | ".join(sys_lines))
+	return "\n".join(lines)

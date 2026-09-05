@@ -43,6 +43,7 @@ func _process(delta: float) -> void:
 	if GameManager.state != GameManager.State.PLAYING and GameManager.state != GameManager.State.BOSS:
 		return
 
+	var start := Time.get_ticks_usec()
 	var minutes := RunManager.elapsed_time / 60.0
 	_spawn_timer -= delta
 	if _spawn_timer <= 0.0:
@@ -52,6 +53,7 @@ func _process(delta: float) -> void:
 	_tick_boss()
 	_tick_elites()
 	_cull_far_enemies()
+	PerformanceManager.report_system_time("waves", Time.get_ticks_usec() - start)
 
 ## Milestone boss at BOSS_TIME seconds (5 min MVP).
 func _tick_boss() -> void:

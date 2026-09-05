@@ -47,10 +47,12 @@ func add_weapon(weapon_data: WeaponData) -> void:
 func _process(delta: float) -> void:
 	if _player == null or not _player.is_player_alive():
 		return
+	var start := Time.get_ticks_usec()
 	for w in weapons:
 		if w.data.type == "orbit":
 			continue  # orbit weapon self-updates
 		w.tick(delta, _player, _enemy_manager)
+	PerformanceManager.report_system_time("weapons", Time.get_ticks_usec() - start)
 
 ## Called by WeaponInstance when its cooldown elapses and a target exists.
 func fire_weapon(weapon: WeaponInstance, player: Node3D, target: Node3D) -> void:
