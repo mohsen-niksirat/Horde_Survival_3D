@@ -107,7 +107,9 @@ func _ready() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		touch_controls.visible = true
 	else:
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		# Desktop: keep the cursor visible (no aiming in this game) —
+		# camera look is right-mouse drag; HUD stays clickable.
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		touch_controls.visible = false
 
 	debug_label.visible = false
@@ -132,9 +134,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 	if event is InputEventMouseButton and event.pressed:
-		if not DisplayServer.is_touchscreen_available() and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-			if GameManager.state == GameManager.State.PLAYING:
-				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		# Left-click on empty space keeps focus for keyboard input on web.
+		pass
 
 func _toggle_pause() -> void:
 	if GameManager.state == GameManager.State.PLAYING or GameManager.state == GameManager.State.BOSS:
@@ -142,8 +143,6 @@ func _toggle_pause() -> void:
 		GameManager.pause_game()
 	elif GameManager.state == GameManager.State.PAUSED:
 		GameManager.resume_game()
-		if not DisplayServer.is_touchscreen_available():
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _process(_delta: float) -> void:
 	if _debug_enabled:

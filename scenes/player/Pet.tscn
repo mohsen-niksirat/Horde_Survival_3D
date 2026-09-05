@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://pet00000000001"]
+[gd_scene load_steps=4 format=3 uid="uid://pet00000000001"]
 
 [ext_resource type="Script" path="res://scenes/player/pet.gd" id="1"]
 
@@ -12,18 +12,9 @@ emission_enabled=true
 emission=Color(1, 0.4, 0.2, 1)
 emission_energy_multiplier=0.6
 
-[sub_resource type="PrismMesh" id="tail_mesh"]
-left_to_right=0.5
-size=Vector3(0.2, 0.5, 0.2)
-
 [node name="Pet" type="Node3D"]
 script=ExtResource("1")
 
 [node name="Body" type="MeshInstance3D" parent="."]
 mesh=SubResource("body_mesh")
-surface_material_override/0=SubResource("body_mat")
-
-[node name="Tail" type="MeshInstance3D" parent="Body"]
-transform=Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, -0.1, 0.35)
-mesh=SubResource("tail_mesh")
 surface_material_override/0=SubResource("body_mat")

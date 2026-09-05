@@ -15,3 +15,7 @@ dist/
 
 # Reference clones (local only)
 .reference/
+
+# Local tools / personal files
+Godot_*.exe
+prompt*.txt

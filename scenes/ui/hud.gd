@@ -10,6 +10,7 @@ extends Control
 @onready var combo_label: Label = $Combo
 @onready var ability1_button: Button = $Abilities/Ability1
 @onready var ability2_button: Button = $Abilities/Ability2
+@onready var pause_button: Button = $PauseButton
 
 var _player: Node
 var _ability_controller: Node
@@ -28,7 +29,14 @@ func bind_player(player: Node) -> void:
 	EventBus.player_leveled_up.connect(_on_level_up)
 	RunManager.kills_changed.connect(_on_kills)
 	EventBus.combo_changed.connect(_on_combo)
-	ability1_button.pressed.connect(func(): pass)
+	pause_button.pressed.connect(_on_pause_pressed)
+
+func _on_pause_pressed() -> void:
+	AudioManager.play_game_sfx("ui_click")
+	if GameManager.state == GameManager.State.PLAYING or GameManager.state == GameManager.State.BOSS:
+		GameManager.pause_game()
+	elif GameManager.state == GameManager.State.PAUSED:
+		GameManager.resume_game()
 
 func bind_abilities(controller: Node) -> void:
 	_ability_controller = controller

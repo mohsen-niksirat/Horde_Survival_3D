@@ -6,6 +6,7 @@ var _move_vector: Vector2 = Vector2.ZERO
 var _look_delta: Vector2 = Vector2.ZERO
 var _touch_move_vector: Vector2 = Vector2.ZERO
 var _touch_look_delta: Vector2 = Vector2.ZERO
+var _zoom_delta: float = 0.0
 
 var _using_touch: bool = false
 
@@ -39,18 +40,21 @@ func get_move_vector() -> Vector2:
 	return vec
 
 func get_look_delta() -> Vector2:
-	var delta := _touch_look_delta
-	# Gamepad right stick camera
-	var pad := Vector2(
-		Input.get_action_strength("camera_right") - Input.get_action_strength("camera_left"),
-		Input.get_action_strength("camera_down") - Input.get_action_strength("camera_up")
-	)
-	delta += pad * 220.0
-	return delta
+	# Touch look only — desktop uses captured mouse directly in CameraRig.
+	return _touch_look_delta
 
 func consume_look_delta() -> Vector2:
 	var d := get_look_delta()
 	_touch_look_delta = Vector2.ZERO
+	return d
+
+## Pinch zoom from the touch controls (negative = zoom in).
+func add_zoom_delta(delta: float) -> void:
+	_zoom_delta += delta
+
+func consume_zoom_delta() -> float:
+	var d := _zoom_delta
+	_zoom_delta = 0.0
 	return d
 
 func is_action_pressed(action: String) -> bool:
