@@ -122,7 +122,7 @@ func _drop_xp(enemy: Node, position: Vector3, xp_mult: float = 1.0) -> void:
 		get_parent().add_child(orb)
 		orb.setup(per_orb, self, position)
 	# Heart drop — ANY enemy can drop (10%); early survival lifeline
-	if randf() < 0.10:
+	if randf() < 0.05:
 		var heart := PoolManager.acquire("res://scenes/pickups/HeartPickup.tscn")
 		PoolManager.tag(heart, "res://scenes/pickups/HeartPickup.tscn")
 		get_parent().add_child(heart)

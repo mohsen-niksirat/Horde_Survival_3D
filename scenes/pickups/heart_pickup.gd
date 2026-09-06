@@ -26,6 +26,12 @@ func _process(delta: float) -> void:
 	if _life > 25.0:
 		PoolManager.release(self)
 		return
+	# Magnet: drift toward the player when close (no exact walk-over needed)
+	if _player != null and is_instance_valid(_player):
+		var to_p: Vector3 = _player.global_position - global_position
+		to_p.y = 0.0
+		if to_p.length() < 6.0 and to_p.length() > 0.2:
+			global_position += to_p.normalized() * 11.0 * delta
 	_mesh_spin(delta)
 	if not _settled:
 		_vertical_velocity -= GRAVITY * delta

@@ -25,7 +25,8 @@ func _initialize() -> void:
 	player.health.take_damage(DamageEvent.new(40.0, "test"))
 	var hp0: float = player.health.current_hp
 	var hearts := 0
-	for trial in range(20):
+	var count_fn := self
+	for trial in range(120):
 		em.clear_all()
 		em.queue_spawn(drone, player.global_position + Vector3(2, 0, 2), player, 1.0, 1.0, 1.0)
 		for i in range(4):
@@ -33,9 +34,16 @@ func _initialize() -> void:
 			await physics_frame
 		if em.enemy_count() == 0:
 			continue
+		var hearts_before := _count_hearts(main)
 		var e: CharacterBody3D = em.get_all_enemies()[0]
 		e.health.take_damage(DamageEvent.new(9999.0, "test"))
+		for i in range(3):
+			await process_frame
+			await physics_frame
+		hearts += _count_hearts(main)
 
+	# count during the kill loop (hearts get collected/released as we go)
+	_check(hearts > 0, "(pre-check) hearts dropped from early enemies (%d)" % hearts)
 	# walk over all spawned hearts: collect them by touching
 	var world: Node3D = main.get_node("World")
 	for child in world.get_children():
@@ -65,3 +73,10 @@ func _check(cond: bool, label: String) -> void:
 	else:
 		push_error("FAIL: " + label)
 		failures += 1
+
+func _count_hearts(main: Node) -> int:
+	var n := 0
+	for child in main.get_node("World").get_children():
+		if child.name.contains("HeartPickup") and child.visible:
+			n += 1
+	return n
