@@ -78,6 +78,17 @@ func bind_abilities(controller: Node) -> void:
 	_ability_controller = controller
 	ability1_button.text = "Q Meteor"
 	ability2_button.text = "E Freeze"
+	# V-fix: touch ability buttons actually execute on mobile
+	ability1_button.pressed.connect(func():
+		var ac: Node = _ability_controller
+		if ac != null and ac.get_cooldown_ratio("meteor_strike") == 0.0:
+			ac._execute(ac.abilities[0]["data"])
+			ac.abilities[0]["cooldown_left"] = ac.abilities[0]["data"].cooldown)
+	ability2_button.pressed.connect(func():
+		var ac: Node = _ability_controller
+		if ac != null and ac.get_cooldown_ratio("time_freeze") == 0.0:
+			ac._execute(ac.abilities[1]["data"])
+			ac.abilities[1]["cooldown_left"] = ac.abilities[1]["data"].cooldown)
 
 func _process(delta: float) -> void:
 	timer_label.text = RunManager.get_time_string()

@@ -5,15 +5,15 @@
 [sub_resource type="SphereShape3D" id="shape"]
 radius=0.35
 
-[sub_resource type="SphereMesh" id="mesh"]
-radius=0.22
-height=0.44
+[sub_resource type="PrismMesh" id="mesh"]
+left_to_right=0.5
+size=Vector3(0.3, 0.42, 0.3)
 
 [sub_resource type="StandardMaterial3D" id="mat"]
-albedo_color=Color(0.666667, 0.901961, 0.729412, 1)
+albedo_color=Color(0.2, 1, 0.95, 1)
 emission_enabled=true
-emission=Color(0.666667, 0.901961, 0.729412, 1)
-emission_energy_multiplier=0.9
+emission=Color(0.1, 0.95, 0.9, 1)
+emission_energy_multiplier=2.2
 
 [sub_resource type="BoxShape3D" id="pickup_shape"]
 size=Vector3(1.0, 1.0, 1.0)
