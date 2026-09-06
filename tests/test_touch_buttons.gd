@@ -45,8 +45,15 @@ func _initialize() -> void:
 	tc._handle_touch(_touch(1, false, Vector2(920, 320)))
 	_check(im.get_move_vector().length() == 0.0, "movement stops on release")
 
-	# --- 5. No pinch API remnants ---
-	_check(not tc.has_method("_handle_pinch"), "no pinch handler")
+	# --- 5. Touch rings indicator wired ---
+	var ind: Control = tc.get_node_or_null("Indicator")
+	_check(ind != null, "indicator node exists")
+	if ind != null:
+		tc._handle_touch(_touch(0, true, Vector2(150, 400)))
+		tc._handle_drag(_drag(0, Vector2(180, 370)))
+		_check(ind.visible, "ring visible while touching")
+		tc._handle_touch(_touch(0, false, Vector2(180, 370)))
+		_check(not ind.visible, "rings hidden when released")
 
 	if failures == 0:
 		print("TOUCH_BUTTONS_PASS")

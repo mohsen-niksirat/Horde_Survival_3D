@@ -1,24 +1,28 @@
 extends Control
-## Mobile touch controls (CoD-style, button zoom):
-## - Left half: floating joystick wherever touched (movement only)
-## - Right half: camera look — completely independent of movement
-## - Zoom IN/OUT buttons (bottom-right, above ability buttons)
-## No two-finger pinch: it conflicts with the look finger on small screens.
+## CoD-style mobile touch controls with visible rings:
+## - Left half: floating movement ring wherever touched (knob stretches)
+## - Right half: camera look ring — independent of movement
+## - Zoom +/− buttons (bottom right)
+## Rings are drawn by a child TouchIndicator (Node2D) fed on every event.
 
-const JOYSTICK_RADIUS := 110.0
+const RING_RADIUS := 110.0
 const DEAD_ZONE := 0.12
 const BUTTON_ZOOM_STEP := 0.18
 
-@onready var joystick_base: Control = $JoystickBase
-@onready var joystick_knob: Control = $JoystickBase/Knob
 @onready var zoom_in: Button = $ZoomIn
 @onready var zoom_out: Button = $ZoomOut
+@onready var indicator: Control = $Indicator
+
+var _joy_index: int = -1
+var _joy_center: Vector2 = Vector2.ZERO
+var _look_index: int = -1
+var _look_center: Vector2 = Vector2.ZERO
+var _look_last: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	visible = false
 	if DisplayServer.is_touchscreen_available():
 		visible = true
-		joystick_base.modulate.a = 0.45
 	zoom_in.pressed.connect(func(): InputManager.add_zoom_delta(-BUTTON_ZOOM_STEP))
 	zoom_out.pressed.connect(func(): InputManager.add_zoom_delta(BUTTON_ZOOM_STEP))
 
@@ -36,31 +40,24 @@ func _handle_touch(event: InputEventScreenTouch) -> void:
 		if _joy_index == -1 and event.position.x < half:
 			_joy_index = event.index
 			_joy_center = event.position
-			joystick_base.position = _joy_center - joystick_base.size * 0.5
-			joystick_base.modulate.a = 0.7
 		elif _look_index == -1 and event.position.x >= half:
 			_look_index = event.index
+			_look_center = event.position
 			_look_last = event.position
 	else:
 		if event.index == _joy_index:
 			_joy_index = -1
-			_reset_joystick()
+			InputManager.set_touch_move_vector(Vector2.ZERO)
 		elif event.index == _look_index:
 			_look_index = -1
-
-var _joy_index: int = -1
-var _joy_center: Vector2 = Vector2.ZERO
-var _look_index: int = -1
-var _look_last: Vector2 = Vector2.ZERO
+	_push_indicator()
 
 func _handle_drag(event: InputEventScreenDrag) -> void:
 	if event.index == _joy_index:
-		var offset := event.position - _joy_center
-		var length := offset.length()
-		if length > JOYSTICK_RADIUS:
-			offset = offset.normalized() * JOYSTICK_RADIUS
-		joystick_knob.position = joystick_base.size * 0.5 + offset - joystick_knob.size * 0.5
-		var vec := offset / JOYSTICK_RADIUS
+		var offset: Vector2 = event.position - _joy_center
+		if offset.length() > RING_RADIUS:
+			offset = offset.normalized() * RING_RADIUS
+		var vec := offset / RING_RADIUS
 		if vec.length() < DEAD_ZONE:
 			vec = Vector2.ZERO
 		else:
@@ -69,7 +66,18 @@ func _handle_drag(event: InputEventScreenDrag) -> void:
 	elif event.index == _look_index:
 		InputManager.set_touch_look_delta(event.position - _look_last)
 		_look_last = event.position
+	_push_indicator()
 
-func _reset_joystick() -> void:
-	joystick_knob.position = joystick_base.size * 0.5 - joystick_knob.size * 0.5
-	InputManager.set_touch_move_vector(Vector2.ZERO)
+func _push_indicator() -> void:
+	var joy_knob := _joy_center
+	if _joy_index != -1:
+		var offset: Vector2 = InputManager.get_move_vector() * RING_RADIUS
+		joy_knob = _joy_center + offset
+	var look_knob := _look_center
+	if _look_index != -1:
+		var to_look: Vector2 = _look_last - _look_center
+		look_knob = _look_center + to_look.limit_length(RING_RADIUS - 42.0)
+	indicator.update_rings(
+		_joy_index != -1, _joy_center, joy_knob,
+		_look_index != -1, _look_center, look_knob
+	)

@@ -26,6 +26,9 @@ var _zoom: float
 var _current_distance: float
 var _shake_amount: float = 0.0
 var _shake_decay: float = 6.0
+## True on touch devices: mouse motion is EMULATED by touches there and
+## jumps between fingers — camera look must come only from InputManager.
+var _touch_mode: bool = false
 
 @onready var _spring_arm: SpringArm3D = $SpringArm3D
 @onready var _camera: Camera3D = $SpringArm3D/Camera3D
@@ -34,6 +37,7 @@ func _ready() -> void:
 	# Detach from the player's transform: the character body rotates to face
 	# its movement direction — the camera must NOT inherit that rotation.
 	top_level = true
+	_touch_mode = DisplayServer.is_touchscreen_available()
 	_pitch = deg_to_rad(default_pitch_deg)
 	_zoom = clampf(default_zoom, 0.0, 1.0)
 	_current_distance = _target_distance()
@@ -49,9 +53,16 @@ func set_target(target: Node3D) -> void:
 		global_position = _target.global_position + Vector3(0, height, 0)
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Desktop look: plain mouse movement rotates the camera (CoD-style,
-	# no aiming in this game so no pointer lock). Touch look arrives via
-	# InputManager; wheel zoom handled here.
+	# Desktop: plain mouse movement rotates the camera (pointer-locked).
+	# Touch devices: mouse motion is EMULATED from touches and jumps when
+	# fingers land/lift — ignore it there; look comes from InputManager only.
+	if _touch_mode:
+		if event is InputEventMouseButton and event.pressed:
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				_zoom = clampf(_zoom - wheel_zoom_step, 0.0, 1.0)
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				_zoom = clampf(_zoom + wheel_zoom_step, 0.0, 1.0)
+		return
 	if event is InputEventMouseMotion:
 		_yaw -= event.relative.x * yaw_sensitivity
 		_pitch -= event.relative.y * pitch_sensitivity
