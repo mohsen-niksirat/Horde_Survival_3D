@@ -55,6 +55,10 @@ layout_mode=2
 theme_override_font_sizes/font_size=13
 text="100 / 100"
 
+[node name="WeaponIcons" type="HBoxContainer" parent="TopLeft"]
+layout_mode=2
+theme_override_constants/separation=4
+
 [node name="TopRight" type="VBoxContainer" parent="."]
 layout_mode=1
 anchors_preset=1

@@ -11,9 +11,11 @@ extends Control
 @onready var ability1_button: Button = $Abilities/Ability1
 @onready var ability2_button: Button = $Abilities/Ability2
 @onready var pause_button: Button = $PauseButton
+@onready var weapon_icons: HBoxContainer = $TopLeft/WeaponIcons
 
 var _player: Node
 var _ability_controller: Node
+var _last_tier: String = ""
 
 const TIER_COLORS := {
 	"BRONZE": Color(0.8, 0.65, 0.4),
@@ -29,7 +31,41 @@ func bind_player(player: Node) -> void:
 	EventBus.player_leveled_up.connect(_on_level_up)
 	RunManager.kills_changed.connect(_on_kills)
 	EventBus.combo_changed.connect(_on_combo)
+	EventBus.upgrade_applied.connect(_on_upgrade_applied)
 	pause_button.pressed.connect(_on_pause_pressed)
+	_refresh_weapon_icons()
+
+func _on_upgrade_applied(_title: String) -> void:
+	_refresh_weapon_icons()
+
+## V7: data-driven weapon icons with level pips.
+func _refresh_weapon_icons() -> void:
+	if _player == null:
+		return
+	for child in weapon_icons.get_children():
+		child.queue_free()
+	var wc: Node = _player.weapon_controller
+	var colors: Dictionary = wc.WEAPON_FLASH_COLORS
+	for w in wc.weapons:
+		var icon := Panel.new()
+		icon.custom_minimum_size = Vector2(36, 36)
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = colors.get(w.data.id, Color(0.8, 0.8, 0.8))
+		sb.set_corner_radius_all(7)
+		sb.border_color = Color(0, 0, 0, 0.4)
+		sb.set_border_width_all(2)
+		if w.evolved:
+			sb.border_color = Color(1.0, 0.84, 0.0)
+		icon.add_theme_stylebox_override("panel", sb)
+		var lv := Label.new()
+		lv.text = str(w.level if not w.evolved else 5)
+		lv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lv.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lv.set_anchors_preset(Control.PRESET_FULL_RECT)
+		lv.add_theme_font_size_override("font_size", 16)
+		lv.add_theme_color_override("font_color", Color(0, 0, 0, 0.85))
+		icon.add_child(lv)
+		weapon_icons.add_child(icon)
 
 func _on_pause_pressed() -> void:
 	AudioManager.play_game_sfx("ui_click")
@@ -43,15 +79,17 @@ func bind_abilities(controller: Node) -> void:
 	ability1_button.text = "Q Meteor"
 	ability2_button.text = "E Freeze"
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	timer_label.text = RunManager.get_time_string()
 	if _player == null:
 		return
+	# V7: bars ease toward their true values (animated feel)
+	var hp_target: float = _player.health.current_hp
 	hp_bar.max_value = _player.health.max_hp
-	hp_bar.value = _player.health.current_hp
+	hp_bar.value = lerpf(hp_bar.value, hp_target, minf(10.0 * delta, 1.0))
 	hp_label.text = "%d / %d" % [int(_player.health.current_hp), int(_player.health.max_hp)]
-	xp_bar.value = _player.experience.current_xp
 	xp_bar.max_value = _player.experience.xp_to_next
+	xp_bar.value = lerpf(xp_bar.value, _player.experience.current_xp, minf(10.0 * delta, 1.0))
 	level_label.text = "Lv %d" % _player.experience.level
 
 	# Ability cooldown indicators
@@ -78,6 +116,18 @@ func _on_combo(count: int, multiplier: float) -> void:
 	combo_label.add_theme_color_override("font_color", TIER_COLORS.get(tier, Color.WHITE))
 	var size := 20 + mini(count / 10, 6) * 3
 	combo_label.add_theme_font_size_override("font_size", size)
+	# V7: pop + pulse animation on tier change
+	if tier != _last_tier and tier != "BRONZE":
+		_last_tier = tier
+		combo_label.pivot_offset = combo_label.size * 0.5
+		var tween := create_tween()
+		combo_label.scale = Vector2(1.6, 1.6)
+		tween.tween_property(combo_label, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	elif count % 5 == 0:
+		combo_label.pivot_offset = combo_label.size * 0.5
+		combo_label.scale = Vector2(1.1, 1.1)
+		var tw2 := create_tween()
+		tw2.tween_property(combo_label, "scale", Vector2.ONE, 0.12)
 
 func _combo_tier(count: int) -> String:
 	if count >= 200: return "GODLIKE"
