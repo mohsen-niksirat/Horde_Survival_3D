@@ -18,6 +18,8 @@ var _spawn_timer: float = 0.0
 var _active: bool = false
 var _last_elite_level: int = 0
 var _boss_spawned: bool = false
+var _next_endless_boss_time: float = 300.0
+var _endless_boss_count: int = 0
 const BOSS_TIME := 300.0
 const BOSS_SCENE := "res://scenes/bosses/Boss.tscn"
 
@@ -56,15 +58,20 @@ func _process(delta: float) -> void:
 	_tick_elites()
 	PerformanceManager.report_system_time("waves", Time.get_ticks_usec() - start)
 
-## Milestone boss at BOSS_TIME seconds (5 min MVP).
+## Milestone boss at BOSS_TIME seconds; in Endless, respawns every 5 min
+## at +30% stats.
 func _tick_boss() -> void:
-	if _boss_spawned:
+	if RunManager.endless:
+		if RunManager.elapsed_time >= _next_endless_boss_time:
+			_next_endless_boss_time += 300.0
+			_endless_boss_count += 1
+			_spawn_boss(1.0 + 0.3 * _endless_boss_count)
 		return
-	if RunManager.elapsed_time >= BOSS_TIME:
+	if not _boss_spawned and RunManager.elapsed_time >= BOSS_TIME:
 		_boss_spawned = true
-		_spawn_boss()
+		_spawn_boss(1.0)
 
-func _spawn_boss() -> void:
+func _spawn_boss(stat_scale: float = 1.0) -> void:
 	var boss_scene: PackedScene = load(BOSS_SCENE)
 	var boss := boss_scene.instantiate()
 	get_parent().add_child(boss)
@@ -73,7 +80,7 @@ func _spawn_boss() -> void:
 	pos.x = clampf(pos.x, -55, 55)
 	pos.z = clampf(pos.z, -55, 55)
 	boss.global_position = Vector3(pos.x, 0.5, pos.z)
-	boss.setup(player, enemy_manager, arena, DifficultyManager.hp_scale(DifficultyManager.difficulty_multiplier(player.experience.level, RunManager.elapsed_time / 60.0)) * 0.4)
+	boss.setup(player, enemy_manager, arena, DifficultyManager.hp_scale(DifficultyManager.difficulty_multiplier(player.experience.level, RunManager.elapsed_time / 60.0)) * 0.4 * stat_scale)
 	RunManager.set_boss_active(true)
 	GameManager.change_state(GameManager.State.BOSS)
 	EventBus.boss_spawned.emit(boss)

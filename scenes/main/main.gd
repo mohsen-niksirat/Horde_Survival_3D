@@ -32,6 +32,10 @@ func _ready() -> void:
 	enemy_manager.name = "EnemyManager"
 	add_child(enemy_manager)
 
+	# V9: apply purchased permanent upgrades to the player's stats
+	preload("res://scenes/menu/meta_shop.gd").apply_meta_upgrades(player.stat_block)
+	player.on_stats_changed()
+
 	# Projectile container + weapon binding
 	projectile_root = Node3D.new()
 	projectile_root.name = "Projectiles"

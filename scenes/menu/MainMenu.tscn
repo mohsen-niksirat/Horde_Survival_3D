@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://menu0000000001"]
+[gd_scene load_steps=5 format=3 uid="uid://menu0000000001"]
 
 [ext_resource type="Script" path="res://scenes/menu/main_menu.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/menu/SettingsMenu.tscn" id="2"]
 [ext_resource type="Script" path="res://scenes/menu/menu_animated_bg.gd" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/menu/MetaShop.tscn" id="4"]
 
 [node name="MainMenu" type="Control"]
 layout_mode=3
@@ -84,6 +85,16 @@ layout_mode=2
 theme_override_font_sizes/font_size=18
 text="SETTINGS"
 
+[node name="UpgradesButton" type="Button" parent="Center/Layout"]
+custom_minimum_size=Vector2(320, 44)
+layout_mode=2
+theme_override_font_sizes/font_size=18
+text="UPGRADES"
+
+[node name="EndlessCheck" type="CheckBox" parent="Center/Layout"]
+layout_mode=2
+text="ENDLESS MODE (survive past 15:00)"
+
 [node name="HowToPlayButton" type="Button" parent="Center/Layout"]
 custom_minimum_size=Vector2(320, 44)
 layout_mode=2
@@ -127,3 +138,5 @@ horizontal_alignment=1
 vertical_alignment=1
 
 [node name="SettingsMenu" parent="." instance=ExtResource("2")]
+
+[node name="MetaShop" parent="." instance=ExtResource("4")]

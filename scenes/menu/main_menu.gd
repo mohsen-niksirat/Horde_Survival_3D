@@ -7,6 +7,8 @@ extends Control
 @onready var weapons_button: Button = $Center/Layout/WeaponsButton
 @onready var achievements_button: Button = $Center/Layout/AchievementsButton
 @onready var settings_button: Button = $Center/Layout/SettingsButton
+@onready var upgrades_button: Button = $Center/Layout/UpgradesButton
+@onready var endless_check: CheckBox = $Center/Layout/EndlessCheck
 @onready var how_to_play_button: Button = $Center/Layout/HowToPlayButton
 @onready var quit_button: Button = $Center/Layout/QuitButton
 @onready var notice_label: Label = $Notice
@@ -14,10 +16,11 @@ extends Control
 
 func _ready() -> void:
 	play_button.pressed.connect(_on_play_pressed)
-	characters_button.pressed.connect(_on_placeholder_pressed.bind("Characters coming post-MVP"))
+	characters_button.pressed.connect(_on_placeholder_pressed.bind("Characters coming soon"))
 	weapons_button.pressed.connect(_on_placeholder_pressed.bind("Weapons collection coming soon"))
 	achievements_button.pressed.connect(_on_achievements_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
+	upgrades_button.pressed.connect(_on_upgrades_pressed)
 	how_to_play_button.pressed.connect(_on_placeholder_pressed.bind("WASD to move - survive the horde - weapons fire automatically - Q/E abilities"))
 	quit_button.pressed.connect(_on_quit_pressed)
 	notice_label.text = ""
@@ -37,7 +40,12 @@ func _update_stats() -> void:
 func _on_play_pressed() -> void:
 	AudioManager.play_game_sfx("ui_click")
 	play_button.disabled = true
+	RunManager.endless = endless_check.button_pressed
 	GameManager.start_game()
+
+func _on_upgrades_pressed() -> void:
+	AudioManager.play_game_sfx("ui_click")
+	$MetaShop.open()
 
 func _on_achievements_pressed() -> void:
 	var achievements: Dictionary = SaveManager.get_meta_data("achievements", {})

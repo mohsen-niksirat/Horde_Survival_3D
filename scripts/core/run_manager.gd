@@ -5,6 +5,7 @@ signal time_changed(elapsed: float)
 signal kills_changed(kills: int)
 
 var is_running: bool = false
+var endless: bool = false
 var elapsed_time: float = 0.0
 var kills: int = 0
 var gold_earned: float = 0.0
@@ -26,6 +27,10 @@ func start_run() -> void:
 	gold_earned = 0.0
 	boss_active = false
 	EventBus.run_started.emit()
+
+func start_run_endless() -> void:
+	start_run()
+	endless = true
 
 func end_run() -> void:
 	is_running = false

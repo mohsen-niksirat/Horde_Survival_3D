@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://touch000000001"]
+[gd_scene load_steps=3 format=3 uid="uid://touch000000001"]
 
 [ext_resource type="Script" path="res://scenes/ui/touch_controls.gd" id="1"]
 
@@ -11,15 +11,6 @@ grow_horizontal=2
 grow_vertical=2
 mouse_filter=2
 script=ExtResource("1")
-
-[node name="LookRegion" type="Control" parent="."]
-layout_mode=1
-anchors_preset=15
-anchor_right=1.0
-anchor_bottom=1.0
-grow_horizontal=2
-grow_vertical=2
-mouse_filter=2
 
 [node name="JoystickBase" type="Control" parent="."]
 layout_mode=0
@@ -47,3 +38,29 @@ offset_right=144.0
 offset_bottom=144.0
 mouse_filter=2
 self_modulate=Color(1, 1, 1, 0.35)
+
+[node name="ZoomIn" type="Button" parent="."]
+layout_mode=1
+anchors_preset=1
+anchor_left=1.0
+anchor_right=1.0
+offset_left=-160.0
+offset_top=-250.0
+offset_right=-100.0
+offset_bottom=-190.0
+grow_horizontal=0
+theme_override_font_sizes/font_size=26
+text="+"
+
+[node name="ZoomOut" type="Button" parent="."]
+layout_mode=1
+anchors_preset=1
+anchor_left=1.0
+anchor_right=1.0
+offset_left=-92.0
+offset_top=-250.0
+offset_right=-32.0
+offset_bottom=-190.0
+grow_horizontal=0
+theme_override_font_sizes/font_size=26
+text="-"
