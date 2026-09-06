@@ -14,6 +14,10 @@ const PARTICLE_CAPS := {Quality.LOW: 50, Quality.MEDIUM: 90, Quality.HIGH: 140}
 const DAMAGE_NUMBER_CAPS := {Quality.LOW: 20, Quality.MEDIUM: 30, Quality.HIGH: 40}
 
 var quality: int = Quality.MEDIUM
+## V21C: AUTO mode — watches FPS and steps the tier down/up automatically.
+var auto_mode: bool = false
+var _low_time: float = 0.0
+var _high_time: float = 0.0
 
 ## Live counters (updated by spawners/pools each frame or on change).
 var active_enemies: int = 0
@@ -35,12 +39,36 @@ func _ready() -> void:
 	quality_changed.emit(quality)
 
 ## V10: shadows are the first thing to drop on LOW tier.
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	var root := get_tree().root
 	var suns := root.find_children("*", "DirectionalLight3D", true, false)
 	for sun in suns:
 		if sun is DirectionalLight3D:
 			sun.shadow_enabled = quality != Quality.LOW
+	if auto_mode:
+		_auto_tick(delta)
+
+## AUTO: sustained low FPS steps down (HIGH->MEDIUM->LOW); sustained high
+## FPS recovers upward, never above HIGH. fps_override for tests.
+func _auto_tick(delta: float, fps_override: int = -1) -> void:
+	var fps := Engine.get_frames_per_second()
+	if fps_override > 0:
+		fps = fps_override
+	if fps < 26:
+		_low_time += delta
+		_high_time = 0.0
+		if _low_time > 4.0 and quality > Quality.LOW:
+			_low_time = 0.0
+			set_quality(quality - 1, false)
+	elif fps > 55:
+		_high_time += delta
+		_low_time = 0.0
+		if _high_time > 20.0 and quality < Quality.HIGH:
+			_high_time = 0.0
+			set_quality(quality + 1, false)
+	else:
+		_low_time = 0.0
+		_high_time = 0.0
 
 func set_quality(tier: int, save: bool = true) -> void:
 	quality = clampi(tier, Quality.LOW, Quality.HIGH)

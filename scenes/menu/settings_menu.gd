@@ -18,6 +18,7 @@ func _ready() -> void:
 	quality_option.add_item("Low")
 	quality_option.add_item("Medium")
 	quality_option.add_item("High")
+	quality_option.add_item("Auto")
 
 	master_slider.value = SaveManager.get_setting("master_volume", 0.8)
 	music_slider.value = SaveManager.get_setting("music_volume", 0.7)
@@ -62,7 +63,11 @@ func _on_shake(pressed: bool) -> void:
 	SaveManager.set_setting("screen_shake", pressed)
 
 func _on_quality(index: int) -> void:
-	PerformanceManager.set_quality(index)
+	PerformanceManager.auto_mode = index == 3
+	if index != 3:
+		PerformanceManager.set_quality(index)
+	if PerformanceManager.auto_mode:
+		PerformanceManager.set_quality(PerformanceManager.Quality.HIGH)
 
 func _on_close() -> void:
 	visible = false
