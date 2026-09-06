@@ -6,6 +6,7 @@ var failures := 0
 
 func _initialize() -> void:
 	var game_manager := root.get_node("GameManager")
+	root.get_node("SaveManager").set_meta_data("meta_upgrades", {})
 
 	# --- Resources load ---
 	for id in ["mage", "paladin", "rogue"]:
