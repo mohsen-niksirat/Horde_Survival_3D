@@ -42,6 +42,16 @@ func _ready() -> void:
 	add_child(projectile_root)
 	player.bind_combat(enemy_manager, projectile_root)
 
+	# V13: apply the selected character (stats; weapon set in bind_combat)
+	var char_path := "res://data/characters/%s.tres" % GameManager.selected_character_id
+	if ResourceLoader.exists(char_path):
+		var ch: CharacterData = load(char_path)
+		player.stat_block.add_modifier("max_hp", 0.0, ch.max_hp_pct)
+		player.stat_block.add_modifier("move_speed", 0.0, ch.move_speed_pct)
+		player.stat_block.add_modifier("might", 0.0, ch.might_pct)
+		player.on_stats_changed()
+		player.health.setup(player.stat_block.get_stat("max_hp"))
+
 	# Horde spawning
 	wave_manager = Node.new()
 	wave_manager.set_script(WAVE_MANAGER)

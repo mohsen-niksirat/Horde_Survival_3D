@@ -36,8 +36,12 @@ func _ready() -> void:
 func bind_combat(enemy_manager: Node, projectile_root: Node3D) -> void:
 	## Called by Main after both player and systems exist.
 	weapon_controller.setup(self, enemy_manager, projectile_root)
-	# MVP starting weapon (Phase 6 makes this data/character-driven)
-	weapon_controller.add_weapon(load("res://data/weapons/fireball.tres"))
+	# Starting weapon: selected character's weapon (V13), default fireball
+	var char_path := "res://data/characters/%s.tres" % GameManager.selected_character_id
+	var weapon_id := "fireball"
+	if ResourceLoader.exists(char_path):
+		weapon_id = (load(char_path) as CharacterData).starting_weapon_id
+	weapon_controller.add_weapon(load("res://data/weapons/%s.tres" % weapon_id))
 
 func get_pickup_radius() -> float:
 	return stat_block.get_stat("pickup_radius")

@@ -16,7 +16,7 @@ extends Control
 
 func _ready() -> void:
 	play_button.pressed.connect(_on_play_pressed)
-	characters_button.pressed.connect(_on_placeholder_pressed.bind("Characters coming soon"))
+	characters_button.pressed.connect(_on_characters_pressed)
 	weapons_button.pressed.connect(_on_placeholder_pressed.bind("Weapons collection coming soon"))
 	achievements_button.pressed.connect(_on_achievements_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
@@ -42,6 +42,10 @@ func _on_play_pressed() -> void:
 	play_button.disabled = true
 	RunManager.endless = endless_check.button_pressed
 	GameManager.start_game()
+
+func _on_characters_pressed() -> void:
+	AudioManager.play_game_sfx("ui_click")
+	$CharacterSelect.open()
 
 func _on_upgrades_pressed() -> void:
 	AudioManager.play_game_sfx("ui_click")

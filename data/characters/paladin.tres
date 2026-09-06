@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3 uid="uid://char_paladin01"]
+
+[ext_resource type="Script" path="res://scripts/progression/character_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "paladin"
+display_name = "Paladin"
+description = "+30% HP, -10% speed. Starts with Orbiting Shield."
+color = Color(0.95, 0.85, 0.4, 1)
+starting_weapon_id = "orbiting_shield"
+max_hp_pct = 0.3
+move_speed_pct = -0.1
+might_pct = 0.0
