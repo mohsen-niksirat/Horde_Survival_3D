@@ -131,6 +131,31 @@ func _make_heal_option() -> UpgradeOption:
 	opt.description = "Restore 30% of max HP"
 	return opt
 
+## V12 weapon synergies: holding the paired weapons grants a passive bonus
+## (applied once per run, data table kept here for MVP simplicity).
+const SYNERGIES := [
+	{"id": "firestorm", "requires": ["fireball", "lightning"], "title": "SYNERGY: Firestorm (+15% might)", "stat": "might", "percent": 0.15},
+	{"id": "storm_caller", "requires": ["magic_missile", "lightning"], "title": "SYNERGY: Storm Caller (-10% cooldown)", "stat": "cooldown_mult", "percent": -0.10},
+	{"id": "iron_tempest", "requires": ["orbiting_shield", "divine_spear"], "title": "SYNERGY: Iron Tempest (+10% area)", "stat": "area_mult", "percent": 0.10},
+]
+var applied_synergies: Dictionary = {}
+
+## Called after any weapon-affecting choice.
+func _check_synergies() -> void:
+	var ids: Array = []
+	for w in player.weapon_controller.weapons:
+		ids.append(w.data.id)
+	for syn in SYNERGIES:
+		var ok: bool = true
+		for req in syn["requires"]:
+			if not ids.has(req):
+				ok = false
+		if ok and not applied_synergies.has(syn["id"]):
+			applied_synergies[syn["id"]] = true
+			player.stat_block.add_modifier(syn["stat"], 0.0, syn["percent"])
+			player.on_stats_changed()
+			EventBus.upgrade_applied.emit(syn["title"])
+
 ## Apply the chosen option.
 func apply_choice(option: UpgradeOption) -> void:
 	match option.kind:
@@ -155,6 +180,7 @@ func apply_choice(option: UpgradeOption) -> void:
 		UpgradeOption.Kind.HEAL:
 			player.health.heal(player.health.max_hp * 0.3)
 	EventBus.upgrade_applied.emit(option.title)
+	_check_synergies()
 
 func _weapon_name(id: String) -> String:
 	for w in player.weapon_controller.weapons:

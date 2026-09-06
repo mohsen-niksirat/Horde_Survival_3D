@@ -25,7 +25,11 @@ func trigger(weapon_like, target_pos: Vector3, enemy_manager: Node, player: Node
 		might = player.get_stat("might")
 	for enemy in hits:
 		var is_crit: bool = randf() < weapon_like.get_crit_chance()
-		var event := DamageEvent.new(weapon_like.get_damage() * might * (2.0 if is_crit else 1.0), "lightning", is_crit)
+		var amount: float = weapon_like.get_damage() * might * (2.0 if is_crit else 1.0)
+		# V12 status interaction: lightning DETONATES burning enemies (+50%)
+		if enemy.has_method("apply_status_from") and enemy.status.has_effect("burn"):
+			amount *= 1.5
+		var event := DamageEvent.new(amount, "lightning", is_crit)
 		enemy.health.take_damage(event)
 		EventBus.enemy_damaged.emit(enemy, event.final_amount, is_crit)
 
