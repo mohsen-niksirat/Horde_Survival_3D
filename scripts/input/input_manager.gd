@@ -22,7 +22,9 @@ func set_touch_move_vector(vec: Vector2) -> void:
 	_using_touch = true
 
 func set_touch_look_delta(delta: Vector2) -> void:
-	_touch_look_delta = delta
+	# ACCUMULATE: multiple drag events can arrive within one frame
+	# (touch sample rate > frame rate). Assignment would drop rotation.
+	_touch_look_delta += delta
 	_using_touch = true
 
 func clear_touch() -> void:

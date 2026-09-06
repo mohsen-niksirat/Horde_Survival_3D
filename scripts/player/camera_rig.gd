@@ -13,6 +13,8 @@ extends Node3D
 @export var default_zoom: float = 0.45  # 0 = closest, 1 = farthest
 @export var yaw_sensitivity: float = 0.0032
 @export var pitch_sensitivity: float = 0.0028
+## Touch look multiplier (separate tuning knob from desktop mouse).
+@export var touch_look_multiplier: float = 1.0
 @export var position_smoothing: float = 8.0
 @export var zoom_speed: float = 3.0
 @export var wheel_zoom_step: float = 0.1
@@ -81,7 +83,7 @@ func _process(delta: float) -> void:
 		return
 
 	# Touch look — consumed so each drag delta applies exactly once
-	var look := InputManager.consume_look_delta()
+	var look := InputManager.consume_look_delta() * touch_look_multiplier
 	if look.length_squared() > 0.01:
 		_yaw -= look.x * yaw_sensitivity
 		_pitch -= look.y * pitch_sensitivity
