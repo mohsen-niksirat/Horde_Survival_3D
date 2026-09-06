@@ -19,6 +19,7 @@ func setup(heal: float, p_player: Node3D, spawn_pos: Vector3) -> void:
 	_settled = false
 	_vertical_velocity = 3.0
 	global_position = spawn_pos + Vector3(randf_range(-0.5, 0.5), 0.8, randf_range(-0.5, 0.5))
+	set_deferred("monitoring", true)
 
 func _process(delta: float) -> void:
 	_life += delta
