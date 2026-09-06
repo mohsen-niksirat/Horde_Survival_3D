@@ -1,0 +1,46 @@
+extends SceneTree
+## V8 validation: three music layers build as looped streams, intensity
+## cross-fades by game state, cached once.
+
+var failures := 0
+
+func _initialize() -> void:
+	var main_ps: PackedScene = load("res://scenes/main/Main.tscn")
+	var main := main_ps.instantiate()
+	root.add_child(main)
+	for i in range(6):
+		await process_frame
+		await physics_frame
+
+	var music: Node = main.get_node_or_null("MusicDirector")
+	_check(music != null, "MusicDirector exists")
+	_check(music._built, "3 layers built")
+	_check(music._players.size() == 3, "calm/tense/boss players (%d)" % music._players.size())
+	for key in music._players:
+		var p: AudioStreamPlayer = music._players[key]
+		_check(p.stream is AudioStreamWAV, "layer %s is WAV" % str(key))
+		_check(p.stream.loop_mode == AudioStreamWAV.LOOP_FORWARD, "layer loops")
+	_check(music._current == 0, "starts CALM")
+
+	# --- Boss intensity switch ---
+	var game_manager := root.get_node("GameManager")
+	game_manager.change_state(game_manager.State.BOSS)
+	await process_frame
+	_check(music._current == 2, "boss intensity on BOSS state")
+
+	game_manager.change_state(game_manager.State.PLAYING)
+	await process_frame
+	_check(music._current == 0, "back to calm on PLAYING")
+
+	if failures == 0:
+		print("V8_AUDIO_PASS")
+	else:
+		print("V8_AUDIO_FAIL failures=", failures)
+	quit(0 if failures == 0 else 1)
+
+func _check(cond: bool, label: String) -> void:
+	if cond:
+		print("OK: ", label)
+	else:
+		push_error("FAIL: " + label)
+		failures += 1

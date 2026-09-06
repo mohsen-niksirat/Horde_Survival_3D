@@ -107,6 +107,20 @@ func _ready() -> void:
 	add_child(juice)
 	juice.setup(player)
 
+	# V8 procedural music with state-driven intensity
+	var music := Node.new()
+	music.set_script(preload("res://scripts/audio/music_director.gd"))
+	music.name = "MusicDirector"
+	add_child(music)
+	music.build_music()
+	music.set_intensity(0)  # calm
+	EventBus.game_state_changed.connect(func(new_state, _old):
+		if new_state == GameManager.State.BOSS:
+			music.set_intensity(2)
+		elif new_state == GameManager.State.PLAYING:
+			music.set_intensity(0 if RunManager.elapsed_time < 300.0 else 1)
+	)
+
 	# Boss death → back to PLAYING state
 	EventBus.boss_died.connect(_on_boss_died)
 
