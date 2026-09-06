@@ -12,6 +12,23 @@ extends Control
 @onready var ability2_button: Button = $Abilities/Ability2
 @onready var pause_button: Button = $PauseButton
 @onready var weapon_icons: HBoxContainer = $TopLeft/WeaponIcons
+@onready var hint_label: Label = $HintLabel
+
+## V14 onboarding: rotating contextual hints during the first 90 seconds.
+const HINTS := [
+	"Move: WASD / joystick (left side)",
+	"Weapons fire automatically - stay close to enemies",
+	"Cyan crystals = XP - walk near them",
+	"Gold drops from every kill - spend it on UPGRADES",
+	"Abilities: Q / E (or touch buttons)",
+	"Hearts heal you - grab them!",
+	"Pause: II button or Esc / P",
+	"Zoom: mouse wheel / + and - buttons",
+]
+
+var _hint_time: float = 0.0
+var _hint_index: int = 0
+var _hints_active: bool = false
 
 var _player: Node
 var _ability_controller: Node
@@ -102,6 +119,7 @@ func _process(delta: float) -> void:
 	xp_bar.max_value = _player.experience.xp_to_next
 	xp_bar.value = lerpf(xp_bar.value, _player.experience.current_xp, minf(10.0 * delta, 1.0))
 	level_label.text = "Lv %d" % _player.experience.level
+	_process_hints(delta)
 
 	# Ability cooldown indicators
 	if _ability_controller != null:
@@ -116,6 +134,22 @@ func _on_level_up(_level: int) -> void:
 
 func _on_kills(kills: int) -> void:
 	kills_label.text = "Kills: %d  Gold: %d" % [kills, int(RunManager.gold_earned)]
+
+func _process_hints(delta: float) -> void:
+	# Contextual onboarding: only during the first 90 seconds of a run
+	if not RunManager.is_running or RunManager.elapsed_time > 90.0:
+		if hint_label.visible:
+			hint_label.visible = false
+			_hints_active = false
+		return
+	_hints_active = true
+	hint_label.visible = true
+	_hint_time += delta
+	if _hint_time >= 11.0:
+		_hint_time = 0.0
+		_hint_index = (_hint_index + 1) % HINTS.size()
+	hint_label.text = HINTS[_hint_index]
+	hint_label.modulate.a = clampf(1.0 - (_hint_time - 9.0) / 2.0, 0.0, 1.0) if _hint_time > 9.0 else 1.0
 
 func _on_combo(count: int, multiplier: float) -> void:
 	if count <= 0:
