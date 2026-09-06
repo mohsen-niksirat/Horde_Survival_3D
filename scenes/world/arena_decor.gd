@@ -91,6 +91,13 @@ func _build_rocks() -> void:
 		rock_mi.rotation.z = randf_range(-0.12, 0.12)
 		rock_mi.scale = Vector3.ONE * randf_range(0.6, 1.4)
 		parent.add_child(rock_mi)
+		var body := StaticBody3D.new()
+		var shape := CollisionShape3D.new()
+		var bs := BoxShape3D.new()
+		bs.size = Vector3(1.4, 0.9, 1.2) * rock_mi.scale.x
+		shape.shape = bs
+		body.add_child(shape)
+		rock_mi.add_child(body)
 
 func _build_wall_pillars() -> void:
 	var parent := Node3D.new()

@@ -121,6 +121,12 @@ func _drop_xp(enemy: Node, position: Vector3, xp_mult: float = 1.0) -> void:
 		PoolManager.tag(orb, orb_scene)
 		get_parent().add_child(orb)
 		orb.setup(per_orb, self, position)
+	# Heart drop (small chance) - heals 20 on pickup
+	if randf() < 0.03 and data.xp >= 2.0:
+		var heart := PoolManager.acquire("res://scenes/pickups/HeartPickup.tscn")
+		PoolManager.tag(heart, "res://scenes/pickups/HeartPickup.tscn")
+		get_parent().add_child(heart)
+		heart.setup(20.0, self, position)
 
 func _on_leveled_up(new_level: int) -> void:
 	# ProgressionManager handles pause + choice UI (supports stacked levels)
