@@ -159,7 +159,9 @@ on the menu. Headless tests green incl. save round-trip; update docs.
 
 | تاریخ | پرامپت (خلاصه) | نتیجه / تغییرات | وضعیت |
 |---|---|---|---|
-| 2026-09-05 | #1 تمیزکاری + رگرسیون کامل | 13/13 سویت سبز (فاز3 قطعی شد: xp_before قبل از kill). git تمیز | ✅ |
+| 2026-09-05 | #1 تمیزکاری + رگرسیون کامل | 13/13 سویت سبز | ✅ |
+| 2026-09-06 | V1-V10 سری بصری/محتوایی کامل | hero, enemies, weapons, arena, juice, content(4 enemy+5 evo), HUD, music, endless+shop, auto-quality — 24 suite green | ✅ |
+| 2026-09-06 | فیکس موبایل: حذف پینچ، دکمه زوم | test_touch_buttons PASS | ✅ |
 | 2026-09-04 | A1–A5 prompt 2.txt | spawn/dorbin/pet/pause+P/zoom همه PASS | ✅ |
 | 2026-09-04 | CoD-style کنترل | چپ=جوی‌شناور/راست=دوربین/موس آزاد=چرخش/اسکرول+پینچ زوم | ✅ |
 |  |  |  |  |
