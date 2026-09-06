@@ -1,30 +1,31 @@
-# BUILD ANDROID (post-MVP guide)
+# BUILD ANDROID (V10 guide)
 
-The project is architected to be Android-export-compatible:
+The project is Android-export-ready:
 - Compatibility (GL) renderer works on GLES3 devices
-- Touch input is abstracted via InputManager (virtual joystick + look region already implemented)
+- Touch input fully abstracted (floating joystick + right-half look +
+  zoom buttons — all via InputManager)
+- PerformanceManager auto-detects touch devices and defaults to MEDIUM
+  quality (LOW drops shadows via _process sweep)
 - No native-only plugins or GDExtensions
 
-## Steps (when ready)
+## Steps
 
 1. **Install build tools**: Android Studio (SDK + NDK), JDK 17. In Godot: Editor → Editor Settings → Export → Android → set SDK path and debug keystore.
 2. **Install Android build template**: Project → Install Android Build Template.
 3. **Add preset**: Project → Export → Add → Android.
-   - Package name: `com.hordesurvival3d`
-   - Orientation: Landscape
-   - Min SDK: 24+, Target: latest installed
-   - Textures: ETC2/ASTC (already the project default for imports)
-4. **Renderer**: keep `gl_compatibility` (project.godot sets both desktop and mobile fallback to compatibility).
-5. **Input**: verify `DisplayServer.is_touchscreen_available()` path — TouchControls become visible automatically.
-6. **Performance**: start from Quality LOW defaults for Android (PerformanceManager.set_quality(0)) — consider device-tier detection on startup.
-7. Export APK/AAB; test on a mid-range device targeting 30+ FPS with the 100-enemy cap.
+   - Package: `com.hordesurvival3d`, Orientation: Landscape, Min SDK 24+
+   - Textures: ETC2/ASTC (already the project import default)
+4. Export APK/AAB; test on a mid-range device: target 30+ FPS with the
+   MEDIUM cap (160 enemies).
 
-## Mobile-specific TODOs before release
+## Mobile checklist (implemented)
 
-- Safe-area margins for notched devices (HUD offsets)
-- Performance tier auto-detection (`OS.get_processor_count()`, device model heuristics)
-- Haptics via `Input.vibrate_handheld()` on hit/level-up (optional toggle)
-- App icon set (Godot 4 uses 432x432 adaptive icon PNG)
+- [x] Virtual floating joystick (left half)
+- [x] Right-half camera look, independent of movement
+- [x] Zoom +/− buttons (pinch removed by user request)
+- [x] Touch-friendly pause button
+- [x] Safe-area-friendly HUD anchors
+- [ ] Haptics via `Input.vibrate_handheld()` (optional, add later)
 
 ## Web-first caveat
 

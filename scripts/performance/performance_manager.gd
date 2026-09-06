@@ -26,8 +26,21 @@ var _system_times: Dictionary = {}   # name -> {total_usec, frames}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	var saved: int = SaveManager.get_setting("quality", Quality.MEDIUM)
-	set_quality(saved, false)
+	var saved = SaveManager.get_setting("quality", -1)
+	if int(saved) >= Quality.LOW and int(saved) <= Quality.HIGH:
+		quality = int(saved)
+	else:
+		# V10 auto-detection: mobile web / touch devices default to MEDIUM
+		quality = Quality.MEDIUM if DisplayServer.is_touchscreen_available() or OS.has_feature("mobile") else Quality.HIGH
+	quality_changed.emit(quality)
+
+## V10: shadows are the first thing to drop on LOW tier.
+func _process(_delta: float) -> void:
+	var root := get_tree().root
+	var suns := root.find_children("*", "DirectionalLight3D", true, false)
+	for sun in suns:
+		if sun is DirectionalLight3D:
+			sun.shadow_enabled = quality != Quality.LOW
 
 func set_quality(tier: int, save: bool = true) -> void:
 	quality = clampi(tier, Quality.LOW, Quality.HIGH)
