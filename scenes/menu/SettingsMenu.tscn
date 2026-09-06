@@ -103,6 +103,26 @@ max_value=2.5
 step=0.1
 value=1.0
 
+[node name="TouchSensRow" type="HBoxContainer" parent="Center/Panel/Layout"]
+layout_mode=2
+
+[node name="Label" type="Label" parent="Center/Panel/Layout/TouchSensRow"]
+custom_minimum_size=Vector2(120, 0)
+layout_mode=2
+text="Touch Sens."
+
+[node name="TouchSensSlider" type="HSlider" parent="Center/Panel/Layout/TouchSensRow"]
+custom_minimum_size=Vector2(220, 24)
+layout_mode=2
+min_value=0.4
+max_value=2.5
+step=0.1
+value=1.0
+
+[node name="HapticsCheck" type="CheckButton" parent="Center/Panel/Layout"]
+layout_mode=2
+text="Vibration (mobile)"
+
 [node name="QualityRow" type="HBoxContainer" parent="Center/Panel/Layout"]
 layout_mode=2
 

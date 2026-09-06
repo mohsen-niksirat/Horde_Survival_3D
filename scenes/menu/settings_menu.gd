@@ -5,6 +5,8 @@ extends Control
 @onready var music_slider: HSlider = $Center/Panel/Layout/MusicRow/MusicSlider
 @onready var sfx_slider: HSlider = $Center/Panel/Layout/SfxRow/SfxSlider
 @onready var sensitivity_slider: HSlider = $Center/Panel/Layout/SensRow/SensSlider
+@onready var touch_sens_slider: HSlider = $Center/Panel/Layout/TouchSensRow/TouchSensSlider
+@onready var haptics_check: CheckButton = $Center/Panel/Layout/HapticsCheck
 @onready var shake_check: CheckButton = $Center/Panel/Layout/ShakeCheck
 @onready var quality_option: OptionButton = $Center/Panel/Layout/QualityRow/QualityOption
 @onready var close_button: Button = $Center/Panel/Layout/CloseButton
@@ -21,6 +23,8 @@ func _ready() -> void:
 	music_slider.value = SaveManager.get_setting("music_volume", 0.7)
 	sfx_slider.value = SaveManager.get_setting("sfx_volume", 0.8)
 	sensitivity_slider.value = SaveManager.get_setting("look_sensitivity", 1.0)
+	touch_sens_slider.value = SaveManager.get_setting("touch_sensitivity", 1.0)
+	haptics_check.button_pressed = SaveManager.get_setting("haptics", false)
 	shake_check.button_pressed = SaveManager.get_setting("screen_shake", true)
 	quality_option.selected = SaveManager.get_setting("quality", 1)
 
@@ -28,6 +32,8 @@ func _ready() -> void:
 	music_slider.value_changed.connect(_on_volume.bind("music_volume"))
 	sfx_slider.value_changed.connect(_on_volume.bind("sfx_volume"))
 	sensitivity_slider.value_changed.connect(_on_sensitivity)
+	touch_sens_slider.value_changed.connect(_on_touch_sensitivity)
+	haptics_check.toggled.connect(_on_haptics)
 	shake_check.toggled.connect(_on_shake)
 	quality_option.item_selected.connect(_on_quality)
 	close_button.pressed.connect(_on_close)
@@ -35,6 +41,12 @@ func _ready() -> void:
 
 func _on_sensitivity(value: float) -> void:
 	SaveManager.set_setting("look_sensitivity", value)
+
+func _on_touch_sensitivity(value: float) -> void:
+	SaveManager.set_setting("touch_sensitivity", value)
+
+func _on_haptics(pressed: bool) -> void:
+	SaveManager.set_setting("haptics", pressed)
 
 func _on_state_changed(_new_state: int, _old: int) -> void:
 	pass

@@ -43,6 +43,7 @@ func _ready() -> void:
 	top_level = true
 	_touch_mode = DisplayServer.is_touchscreen_available()
 	var sens: float = SaveManager.get_setting("look_sensitivity", 1.0)
+	touch_look_multiplier = SaveManager.get_setting("touch_sensitivity", 1.0)
 	_yaw_sensitivity_base = yaw_sensitivity
 	_pitch_sensitivity_base = pitch_sensitivity
 	yaw_sensitivity *= sens

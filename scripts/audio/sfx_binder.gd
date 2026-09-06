@@ -11,6 +11,13 @@ func _ready() -> void:
 	EventBus.xp_collected.connect(_on_xp)
 	EventBus.boss_spawned.connect(_on_boss_spawned)
 	EventBus.boss_died.connect(_on_boss_died)
+	EventBus.player_died.connect(_on_player_died)
+
+## V11B haptics: short vibration on key gameplay moments (mobile only,
+## user-toggleable via Settings).
+func _haptic(ms: int) -> void:
+	if SaveManager.get_setting("haptics", false) and DisplayServer.is_touchscreen_available():
+		Input.vibrate_handheld(ms)
 
 var _last_hit_ms: int = 0
 
@@ -30,9 +37,11 @@ func _on_enemy_died(_enemy: Node, _pos: Vector3) -> void:
 
 func _on_player_damaged(_amount: float) -> void:
 	AudioManager.play_game_sfx("player_hurt")
+	_haptic(30)
 
 func _on_level_up(_level: int) -> void:
 	AudioManager.play_game_sfx("level_up")
+	_haptic(60)
 
 func _on_xp(_amount: float) -> void:
 	var now := Time.get_ticks_msec()
@@ -42,6 +51,11 @@ func _on_xp(_amount: float) -> void:
 
 func _on_boss_spawned(_boss: Node) -> void:
 	AudioManager.play_game_sfx("boss_warn")
+	_haptic(120)
 
 func _on_boss_died() -> void:
 	AudioManager.play_game_sfx("boss_die")
+	_haptic(200)
+
+func _on_player_died() -> void:
+	_haptic(250)
