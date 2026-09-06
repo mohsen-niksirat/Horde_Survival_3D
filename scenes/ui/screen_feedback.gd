@@ -16,12 +16,12 @@ func bind_player(player: Node) -> void:
 	flash.modulate.a = 0.0
 
 func _process(delta: float) -> void:
-	# Low-HP pulsing vignette (<30%)
+	# Low-HP pulsing vignette (<25%, softer so the arena stays readable)
 	if _player != null and is_instance_valid(_player) and _player.health.is_alive():
 		var ratio: float = _player.health.get_ratio()
-		if ratio < 0.3:
-			var intensity: float = (0.3 - ratio) / 0.3
-			vignette.modulate.a = 0.25 + intensity * 0.3 + sin(Time.get_ticks_msec() / 1000.0 * 6.0) * 0.1
+		if ratio < 0.25:
+			var intensity: float = (0.25 - ratio) / 0.25
+			vignette.modulate.a = 0.15 + intensity * 0.15 + sin(Time.get_ticks_msec() / 1000.0 * 6.0) * 0.05
 		else:
 			vignette.modulate.a = maxf(vignette.modulate.a - delta * 2.0, 0.0)
 	else:

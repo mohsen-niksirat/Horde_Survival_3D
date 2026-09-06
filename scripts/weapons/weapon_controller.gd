@@ -102,19 +102,25 @@ func _fire_pierce(weapon: WeaponInstance, player: Node3D, target: Node3D) -> voi
 	_spawn_projectile(weapon, player, target, weapon.data.projectile_scene)
 
 func _spawn_projectile(weapon: WeaponInstance, player: Node3D, target: Node3D, scene_path: String) -> void:
-	var count := weapon.get_projectile_count()
 	var spawn_pos := player.global_position + Vector3(0, MUZZLE_HEIGHT, 0)
 	var might: float = player.get_stat("might")
 	var area_mult: float = player.get_stat("area_mult")
 	var pool_manager: Node = get_node("/root/PoolManager")
-	var aim := target.global_position + Vector3(0, 0.5, 0) - spawn_pos
+	var count := weapon.get_projectile_count()
+	# V-fix: spread across the N NEAREST DISTINCT enemies instead of firing
+	# multiple shots at one target (wasted shots into space).
+	var candidates: Array = _enemy_manager.get_enemies_in_radius(player.global_position, weapon.data.max_range)
+	candidates.sort_custom(func(a, b):
+		return a.global_position.distance_squared_to(player.global_position) < b.global_position.distance_squared_to(player.global_position))
+	var targets: Array = candidates.slice(0, mini(count, candidates.size()))
+	while targets.size() < count:
+		targets.append(target)
 	for i in range(count):
 		var proj: Node3D = pool_manager.acquire(scene_path)
 		pool_manager.tag(proj, scene_path)
 		_projectile_root.add_child(proj)
-		if i > 0:
-			var spread := deg_to_rad(8.0 * i) * (1 if i % 2 == 1 else -1)
-			aim = aim.rotated(Vector3.UP, spread)
+		var tgt: Node3D = targets[i]
+		var aim := tgt.global_position + Vector3(0, 0.5, 0) - spawn_pos
 		if proj.has_method("setup_fireball"):
 			proj.setup_fireball(weapon, weapon.get_damage() * might, weapon.get_area() * area_mult, weapon.get_crit_chance(), weapon.data, spawn_pos, aim.normalized())
 		else:
@@ -132,7 +138,8 @@ func _spawn_projectile(weapon: WeaponInstance, player: Node3D, target: Node3D, s
 			)
 			if proj is Area3D:
 				proj.rotation.y = atan2(aim.x, aim.z)
-	_muzzle_flash(player, aim.normalized(), weapon.data.id)
+		if i == 0:
+			_muzzle_flash(player, aim.normalized(), weapon.data.id)
 	PerformanceManager.active_projectiles = _projectile_root.get_child_count()
 
 ## Quick light burst at the staff orb, tinted per weapon.

@@ -25,14 +25,20 @@ var base: Dictionary = {
 
 var _flat: Dictionary = {}    # stat -> accumulated flat bonus
 var _percent: Dictionary = {} # stat -> accumulated percent bonus
-var _timed: Array = []        # [{stat, flat, percent, remaining}]
+var _timed: Array = []
+var _applied_keys: Dictionary = {}        # [{stat, flat, percent, remaining}]
 
 func _init(base_override: Dictionary = {}) -> void:
 	for key in base_override:
 		base[key] = base_override[key]
 
 ## Add a permanent modifier. flat adds to base; percent multiplies base.
-func add_modifier(stat: String, flat: float = 0.0, percent: float = 0.0) -> void:
+## Duplicate application with the same key is ignored (idempotent).
+func add_modifier(stat: String, flat: float = 0.0, percent: float = 0.0, key: String = "") -> void:
+	if key != "":
+		if _applied_keys.has(key):
+			return
+		_applied_keys[key] = true
 	if flat != 0.0:
 		_flat[stat] = _flat.get(stat, 0.0) + flat
 	if percent != 0.0:

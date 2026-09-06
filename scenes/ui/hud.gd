@@ -104,7 +104,7 @@ func _on_level_up(_level: int) -> void:
 	pass
 
 func _on_kills(kills: int) -> void:
-	kills_label.text = "Kills: %d" % kills
+	kills_label.text = "Kills: %d  Gold: %d" % [kills, int(RunManager.gold_earned)]
 
 func _on_combo(count: int, multiplier: float) -> void:
 	if count <= 0:

@@ -97,6 +97,9 @@ func take_contact_damage(amount: float, from_position: Vector3) -> void:
 
 func _on_enemy_died(enemy: Node, position: Vector3) -> void:
 	RunManager.register_kill()
+	# Kills grant gold directly (auto-collected) — visible meta currency
+	if enemy.get("data") != null and enemy.data != null:
+		RunManager.add_gold(enemy.data.gold * enemy.gold_mult)
 	var xp_mult: float = 1.0
 	if combo != null:
 		xp_mult = combo.get_multiplier()

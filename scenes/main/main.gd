@@ -36,21 +36,22 @@ func _ready() -> void:
 	preload("res://scenes/menu/meta_shop.gd").apply_meta_upgrades(player.stat_block)
 	player.on_stats_changed()
 
-	# Projectile container + weapon binding
-	projectile_root = Node3D.new()
-	projectile_root.name = "Projectiles"
-	add_child(projectile_root)
-	player.bind_combat(enemy_manager, projectile_root)
-
-	# V13: apply the selected character (stats; weapon set in bind_combat)
+	# V9+V13: apply meta upgrades AND selected character stats FIRST
+	preload("res://scenes/menu/meta_shop.gd").apply_meta_upgrades(player.stat_block)
 	var char_path := "res://data/characters/%s.tres" % GameManager.selected_character_id
 	if ResourceLoader.exists(char_path):
 		var ch: CharacterData = load(char_path)
 		player.stat_block.add_modifier("max_hp", 0.0, ch.max_hp_pct)
 		player.stat_block.add_modifier("move_speed", 0.0, ch.move_speed_pct)
 		player.stat_block.add_modifier("might", 0.0, ch.might_pct)
-		player.on_stats_changed()
-		player.health.setup(player.stat_block.get_stat("max_hp"))
+	player.on_stats_changed()
+	player.health.setup(player.stat_block.get_stat("max_hp"))
+
+	# Projectile container + weapon binding
+	projectile_root = Node3D.new()
+	projectile_root.name = "Projectiles"
+	add_child(projectile_root)
+	player.bind_combat(enemy_manager, projectile_root)
 
 	# Horde spawning
 	wave_manager = Node.new()

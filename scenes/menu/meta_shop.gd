@@ -84,11 +84,11 @@ func apply_to(stats: StatBlock) -> void:
 	for s in STATS:
 		var lvl := _level(s["id"])
 		if lvl > 0:
-			stats.add_modifier(s["stat"], 0.0, s["pct"] * lvl)
+			stats.add_modifier(s["stat"], 0.0, s["pct"] * lvl, "meta_" + s["id"])
 
 ## Static helper usable without instantiating the UI.
 static func apply_meta_upgrades(stats: StatBlock) -> void:
 	for s in STATS:
 		var lvl := int(SaveManager.get_meta_data("meta_upgrades", {}).get(s["id"], 0))
 		if lvl > 0:
-			stats.add_modifier(s["stat"], 0.0, s["pct"] * lvl)
+			stats.add_modifier(s["stat"], 0.0, s["pct"] * lvl, "meta_" + s["id"])
