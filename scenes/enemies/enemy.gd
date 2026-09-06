@@ -158,7 +158,8 @@ func _physics_process(delta: float) -> void:
 					var strafe := Vector3.UP.cross(dir).normalized()
 					dir = strafe * (1.0 if _wobble_seed > PI else -1.0)
 
-		var speed: float = data.move_speed * spd_scale * status.get_speed_factor()
+		# No enemy may outrun the player (player base 6 m/s)
+		var speed: float = minf(data.move_speed * spd_scale * status.get_speed_factor(), 5.5)
 		velocity.x = dir.x * speed
 		velocity.z = dir.z * speed
 		move_and_slide()
