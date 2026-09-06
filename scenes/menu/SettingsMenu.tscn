@@ -87,6 +87,22 @@ max_value=1.0
 step=0.05
 value=0.8
 
+[node name="SensRow" type="HBoxContainer" parent="Center/Panel/Layout"]
+layout_mode=2
+
+[node name="Label" type="Label" parent="Center/Panel/Layout/SensRow"]
+custom_minimum_size=Vector2(120, 0)
+layout_mode=2
+text="Look Sens."
+
+[node name="SensSlider" type="HSlider" parent="Center/Panel/Layout/SensRow"]
+custom_minimum_size=Vector2(220, 24)
+layout_mode=2
+min_value=0.4
+max_value=2.5
+step=0.1
+value=1.0
+
 [node name="QualityRow" type="HBoxContainer" parent="Center/Panel/Layout"]
 layout_mode=2
 

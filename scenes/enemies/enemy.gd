@@ -80,7 +80,11 @@ func setup(p_data: EnemyData, p_player: Node3D, p_hp_scale: float, p_dmg_scale: 
 	EnemyVisuals.build(_mesh, data.id)
 	_collect_flash_materials()
 	var s: float = (1.15 if hp_scale >= 3.0 else 1.0)
-	_mesh.scale = Vector3(s, s, s)
+	# V11A: fade/scale in — softens spawn pop-in
+	var target_scale := Vector3(s, s, s)
+	_mesh.scale = target_scale * 0.25
+	var tween := create_tween()
+	tween.tween_property(_mesh, "scale", target_scale, 0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 	_attack_timer = randf_range(0.0, data.attack_cooldown)
 	_ranged_timer = randf_range(0.5, data.ranged_cooldown if data.ranged_attack else 2.5)

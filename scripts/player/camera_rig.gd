@@ -28,6 +28,8 @@ var _zoom: float
 var _current_distance: float
 var _shake_amount: float = 0.0
 var _shake_decay: float = 6.0
+var _yaw_sensitivity_base: float = 0.0032
+var _pitch_sensitivity_base: float = 0.0028
 ## True on touch devices: mouse motion is EMULATED by touches there and
 ## jumps between fingers — camera look must come only from InputManager.
 var _touch_mode: bool = false
@@ -40,6 +42,11 @@ func _ready() -> void:
 	# its movement direction — the camera must NOT inherit that rotation.
 	top_level = true
 	_touch_mode = DisplayServer.is_touchscreen_available()
+	var sens: float = SaveManager.get_setting("look_sensitivity", 1.0)
+	_yaw_sensitivity_base = yaw_sensitivity
+	_pitch_sensitivity_base = pitch_sensitivity
+	yaw_sensitivity *= sens
+	pitch_sensitivity *= sens
 	_pitch = deg_to_rad(default_pitch_deg)
 	_zoom = clampf(default_zoom, 0.0, 1.0)
 	_current_distance = _target_distance()
