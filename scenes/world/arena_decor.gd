@@ -80,21 +80,21 @@ func _build_rocks() -> void:
 	var parent := Node3D.new()
 	parent.name = "Rocks"
 	add_child(parent)
-	var rock := BoxMesh.new()
-	rock.size = Vector3(1.4, 0.9, 1.2)
+	var rock := SphereMesh.new()
+	rock.radius = 0.7
+	rock.height = 1.0
 	for i in range(EXTRA_ROCKS):
 		var rock_mi := MeshInstance3D.new()
 		rock_mi.mesh = rock
 		rock_mi.material_override = _baked_mat(STONE_COLOR.darkened(randf_range(0.0, 0.25)))
-		rock_mi.position = _random_ring_pos(14.0, 57.0) + Vector3(0, 0.35, 0)
+		rock_mi.position = _random_ring_pos(14.0, 57.0) + Vector3(0, 0.3, 0)
 		rock_mi.rotation.y = randf() * TAU
-		rock_mi.rotation.z = randf_range(-0.12, 0.12)
-		rock_mi.scale = Vector3.ONE * randf_range(0.6, 1.4)
+		rock_mi.scale = Vector3(randf_range(0.9, 1.5), randf_range(0.6, 1.0), randf_range(0.9, 1.5))
 		parent.add_child(rock_mi)
 		var body := StaticBody3D.new()
 		var shape := CollisionShape3D.new()
-		var bs := BoxShape3D.new()
-		bs.size = Vector3(1.4, 0.9, 1.2) * rock_mi.scale.x
+		var bs := SphereShape3D.new()
+		bs.radius = 0.6 * rock_mi.scale.x
 		shape.shape = bs
 		body.add_child(shape)
 		rock_mi.add_child(body)

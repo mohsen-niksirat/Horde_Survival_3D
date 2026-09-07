@@ -101,29 +101,32 @@ static func _build_wisp(v: Node3D) -> void:
 	fin.size = Vector3(0.16, 0.4, 0.16)
 	_mesh(v, fin, core_mat, Vector3(0, 0.14, 0), PI)
 
-# --- Tank Golem: stacked stones, heavy shoulders, glowing core crack ---
+# --- Tank Golem: rounded boulder body, heavy arms, glowing core ---
 static func _build_golem(v: Node3D) -> void:
 	var stone := Color(0.55, 0.43, 0.38)
 	var dark := _mat(stone.darkened(0.2))
 	var mid := _mat(stone)
 	var crack := _mat(Color(1.0, 0.4, 0.15), 1.4)
-	var box := BoxMesh.new()
-	box.size = Vector3(1.1, 0.7, 0.8)
-	_mesh(v, box, mid, Vector3(0, 0.35, 0))     # base slab
-	var torso := BoxMesh.new()
-	torso.size = Vector3(1.3, 0.9, 0.9)
-	_mesh(v, torso, mid, Vector3(0, 1.05, 0))   # torso
-	var head := BoxMesh.new()
-	head.size = Vector3(0.55, 0.45, 0.5)
-	_mesh(v, head, dark, Vector3(0, 1.7, 0.05)) # head
-	var arm := BoxMesh.new()
-	arm.size = Vector3(0.45, 0.9, 0.5)
-	_mesh(v, arm, dark, Vector3(-0.85, 0.9, 0))
-	_mesh(v, arm, dark, Vector3(0.85, 0.9, 0))
-	# glowing crack strip on chest
+	var base := SphereMesh.new()
+	base.radius = 0.55
+	base.height = 0.8
+	_mesh(v, base, dark, Vector3(0, 0.35, 0))
+	var torso := SphereMesh.new()
+	torso.radius = 0.68
+	torso.height = 1.3
+	_mesh(v, torso, mid, Vector3(0, 1.0, 0))
+	var head := SphereMesh.new()
+	head.radius = 0.3
+	head.height = 0.6
+	_mesh(v, head, dark, Vector3(0, 1.72, 0.05))
+	var arm := CapsuleMesh.new()
+	arm.radius = 0.22
+	arm.height = 0.9
+	_mesh(v, arm, dark, Vector3(-0.8, 0.85, 0))
+	_mesh(v, arm, dark, Vector3(0.8, 0.85, 0))
 	var crack_box := BoxMesh.new()
-	crack_box.size = Vector3(0.14, 0.6, 0.05)
-	_mesh(v, crack_box, crack, Vector3(0, 1.1, 0.47))
+	crack_box.size = Vector3(0.12, 0.55, 0.05)
+	_mesh(v, crack_box, crack, Vector3(0, 1.05, 0.6))
 
 # --- Shooter Turret: tripod + rotating barrel head ---
 static func _build_turret(v: Node3D) -> void:
