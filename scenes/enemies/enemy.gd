@@ -121,6 +121,23 @@ func make_elite(p_abilities: Array) -> void:
 		if is_instance_valid(mi):
 			mi.albedo_color = Color(1.0, 0.8, 0.2)
 			mi.set_meta("base_color", Color(1.0, 0.8, 0.2))
+	# V15A: glowing ground ring so elites read instantly in hordes
+	var ring := MeshInstance3D.new()
+	ring.name = "EliteRing"
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.85
+	torus.outer_radius = 1.05
+	ring.mesh = torus
+	var ring_mat := StandardMaterial3D.new()
+	ring_mat.albedo_color = Color(1.0, 0.8, 0.2, 0.85)
+	ring_mat.emission_enabled = true
+	ring_mat.emission = Color(1.0, 0.75, 0.15, 1)
+	ring_mat.emission_energy_multiplier = 1.6
+	ring_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	ring.material_override = ring_mat
+	ring.position = Vector3(0, 0.06, 0)
+	ring.scale = Vector3(1.2, 1.0, 1.2)
+	add_child(ring)
 	elite = $EliteComponent
 	elite.setup(self, _player, get_parent().get_parent().get_enemy_manager() if get_parent().get_parent().has_method("get_enemy_manager") else get_parent().get_parent(), p_abilities)
 
