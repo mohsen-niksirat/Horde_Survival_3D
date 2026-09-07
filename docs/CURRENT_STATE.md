@@ -18,9 +18,9 @@
 1. MultiTouch unit tests are routing-level; real multi-touch browser behavior needs on-device verification (headless limitation) — device runtime verification pending for items 8–11 in PLAYTEST_FEEDBACK.md
 2. Phase test suite has occasional timing flakes (fixed ad-hoc; two tests still slightly order-sensitive)
 3. test_v3 flake re-verified PASS twice; root cause is frame-count dependent waits in tests, not gameplay
-### Visual
-4. Characters (3 roster) not implemented; select screen is placeholder
-5. Boss model minimal (sphere + horns); deserves a dedicated pass
+### Visual (superseded by docs/POST_MVP_STATE.md — code wins)
+4. [RESOLVED at 7c96b4b] 3 characters implemented with select screen; shared hero model = next pass
+5. [RESOLVED at dcf183e] boss model upgraded (horns, glowing eyes, plates)
 6. Menu weapon collection screen is a placeholder
 ### Gameplay
 7. Endless mode balance (post-15min scaling) untested beyond 10 min
@@ -31,7 +31,9 @@
 - GitHub Actions → Pages: green. Live: https://mohsen-niksirat.github.io/Horde_Survival_3D/
 - Custom loading shell (onProgress API fixed), Click-to-Play, WebGL fallback
 
-## Recommended Next Phases (per prompt 3 framework)
+## Recommended Next Phases
+> See docs/POST_MVP_STATE.md §12 (authoritative P-phase order).
+
 - **V11A — feel polish**: movement accel tuning, camera sensitivity settings, hit-stop micro-pause, spawn pop-in fix (fade-in), contextual first-minute hints
 - **V11B — mobile sensitivity setting** (slider in Settings) + haptics toggle
 - **V12 — combat depth**: 2-3 weapon synergies (from reference design), status interactions (burn+lightning)
