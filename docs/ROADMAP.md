@@ -41,3 +41,7 @@
 4. Pooled if high-frequency.
 5. Tested (headless where possible).
 6. Documented (CHANGELOG + phase report) and pushed.
+
+
+## Post-MVP work (V11A–V21C) — all completed & pushed
+- V11A feel polish 4a9030f · V11B touch sens + haptics 5219157 · V12 synergies 3820f2a · V13 characters 7c96b4b`n- Playtest rounds 1–4: multi-target fix, gold economy, meta-HP idempotency, hearts+magnet, bat rebalance, AUTO graphics 67a24f, boss model dcf183e, elite rings 2730c4c, golem/rock shapes 845ed36, XP shards 6c1fbe6`n- V14 onboarding hints e801785`n> Authoritative state + P-phase order: docs/POST_MVP_STATE.md
