@@ -32,10 +32,6 @@ func _ready() -> void:
 	enemy_manager.name = "EnemyManager"
 	add_child(enemy_manager)
 
-	# V9: apply purchased permanent upgrades to the player's stats
-	preload("res://scenes/menu/meta_shop.gd").apply_meta_upgrades(player.stat_block)
-	player.on_stats_changed()
-
 	# V9+V13: apply meta upgrades AND selected character stats FIRST
 	preload("res://scenes/menu/meta_shop.gd").apply_meta_upgrades(player.stat_block)
 	var char_path := "res://data/characters/%s.tres" % GameManager.selected_character_id

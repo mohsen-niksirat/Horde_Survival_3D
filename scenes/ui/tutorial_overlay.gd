@@ -73,4 +73,13 @@ func _on_skip() -> void:
 func _finish() -> void:
 	visible = false
 	get_tree().paused = false
+	# Re-apply the mouse mode now that the run actually starts
+	_apply_mouse_mode()
 	SaveManager.set_setting(SAVE_KEY, true)
+func _apply_mouse_mode() -> void:
+	if DisplayServer.is_touchscreen_available():
+		return
+	if GameManager.state == GameManager.State.PLAYING or GameManager.state == GameManager.State.BOSS:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
