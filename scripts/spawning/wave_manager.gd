@@ -118,6 +118,13 @@ func _spawn_wave(minutes: float) -> void:
 		return
 	var room: int = cap - current
 
+	# Boss pressure: while a boss is alive, thin the horde (30%) so the
+	# player can focus on telegraphs instead of drowning in adds
+	if RunManager.is_boss_active():
+		room = int(room * 0.3)
+		if room <= 0:
+			return
+
 	# Threat budget for this wave
 	var budget: float = DifficultyManager.threat_budget(minutes)
 	var level: int = player.experience.level if player.has_method("get") and "experience" in player else 1

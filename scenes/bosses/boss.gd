@@ -121,6 +121,8 @@ func _start_slam() -> void:
 	_telegraph_pos = player.global_position
 	_telegraph.global_position = Vector3(_telegraph_pos.x, 0.06, _telegraph_pos.z)
 	_telegraph.visible = true
+	# Loud audio cue so the player knows to move even mid-horde
+	AudioManager.play_game_sfx("boss_warn")
 
 func _execute_slam() -> void:
 	_telegraph_active = false

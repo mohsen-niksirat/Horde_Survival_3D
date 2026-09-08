@@ -5,6 +5,8 @@ extends Node3D
 
 const SHIELD_RADIUS_BASE := 2.2
 const HIT_COOLDOWN := 0.35
+## P2 feel: the orbit breathes in and out while it spins.
+const RADIUS_PULSE := 0.35
 @export var shield_scene: PackedScene
 
 var _weapon: WeaponInstance
@@ -29,6 +31,8 @@ func _process(delta: float) -> void:
 	var count := _weapon.get_projectile_count()
 	_sync_shields(count)
 	var radius: float = SHIELD_RADIUS_BASE * sqrt(_weapon.get_area())
+	# Breathing radius: expands ~35% and returns
+	radius *= 1.0 + (sin(_angle * 1.5) * 0.5 + 0.5) * RADIUS_PULSE
 
 	var now := Time.get_ticks_msec() / 1000.0
 	for i in range(_shields.size()):
@@ -61,7 +65,7 @@ func _check_hits(shield: Node3D, now: float) -> void:
 		var might: float = 1.0
 		if _player.has_method("get_stat"):
 			might = _player.get_stat("might")
-		var event := DamageEvent.new(10.0 * might, "orbit_shield")
+		var event := DamageEvent.new(16.0 * might, "orbit_shield")
 		enemy.health.take_damage(event)
 		EventBus.enemy_damaged.emit(enemy, event.final_amount, false)
 
