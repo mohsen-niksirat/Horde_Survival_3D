@@ -37,6 +37,9 @@ func setup(player: CharacterBody3D, enemy_manager: Node, projectile_root: Node3D
 	_projectile_root = projectile_root
 	_orbit_root = Node3D.new()
 	_orbit_root.name = "OrbitRoot"
+	# Decouple from the player body: the body rotates to face its movement
+	# direction and the shields must NOT inherit that rotation.
+	_orbit_root.top_level = true
 	_player.add_child(_orbit_root)
 	_prewarm_lightning()
 
@@ -65,6 +68,7 @@ func add_weapon(weapon_data: WeaponData) -> void:
 			_orbit_root.name = "OrbitRoot"
 			_player.add_child(_orbit_root)
 		var orbit := Node3D.new()
+		orbit.top_level = true
 		orbit.name = "Orbiting_%s" % weapon_data.id
 		orbit.set_script(load("res://scenes/weapons/orbiting_shield_weapon.gd"))
 		_orbit_root.add_child(orbit)
