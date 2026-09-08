@@ -17,7 +17,7 @@ extends Control
 func _ready() -> void:
 	play_button.pressed.connect(_on_play_pressed)
 	characters_button.pressed.connect(_on_characters_pressed)
-	weapons_button.pressed.connect(_on_placeholder_pressed.bind("Weapons collection coming soon"))
+	weapons_button.pressed.connect(_on_weapons_pressed)
 	achievements_button.pressed.connect(_on_achievements_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
@@ -46,6 +46,10 @@ func _on_play_pressed() -> void:
 func _on_characters_pressed() -> void:
 	AudioManager.play_game_sfx("ui_click")
 	$CharacterSelect.open()
+
+func _on_weapons_pressed() -> void:
+	AudioManager.play_game_sfx("ui_click")
+	$WeaponCodex.open()
 
 func _on_upgrades_pressed() -> void:
 	AudioManager.play_game_sfx("ui_click")
