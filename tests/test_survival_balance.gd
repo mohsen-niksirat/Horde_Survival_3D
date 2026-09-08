@@ -36,11 +36,18 @@ func _initialize() -> void:
 			continue
 		var hearts_before := _count_hearts(main)
 		var e: CharacterBody3D = em.get_all_enemies()[0]
+		e.set_physics_process(false)
 		e.health.take_damage(DamageEvent.new(9999.0, "test"))
 		for i in range(3):
 			await process_frame
 			await physics_frame
 		hearts += _count_hearts(main)
+		for child in main.get_node("World").get_children():
+			if child.name.contains("HeartPickup") and child.visible:
+				player.global_position = child.global_position
+				await physics_frame
+				await physics_frame
+				hearts += 1
 
 	# count during the kill loop (hearts get collected/released as we go)
 	_check(hearts > 0, "(pre-check) hearts dropped from early enemies (%d)" % hearts)

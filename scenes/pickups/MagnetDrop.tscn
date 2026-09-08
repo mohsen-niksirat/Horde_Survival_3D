@@ -5,9 +5,9 @@
 [sub_resource type="SphereShape3D" id="shape"]
 radius=0.45
 
-[sub_resource type="SphereMesh" id="mesh"]
-radius=0.26
-height=0.52
+[sub_resource type="CapsuleMesh" id="body_mesh"]
+radius=0.14
+height=0.5
 
 [sub_resource type="StandardMaterial3D" id="mat"]
 albedo_color=Color(0.75, 0.4, 1, 1)
@@ -25,5 +25,15 @@ script=ExtResource("1")
 shape=SubResource("shape")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
-mesh=SubResource("mesh")
+mesh=SubResource("body_mesh")
+surface_material_override/0=SubResource("mat")
+
+[node name="PoleL" type="MeshInstance3D" parent="Mesh"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.18, 0)
+mesh=SubResource("body_mesh")
+surface_material_override/0=SubResource("mat")
+
+[node name="PoleR" type="MeshInstance3D" parent="Mesh"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0.18, 0)
+mesh=SubResource("body_mesh")
 surface_material_override/0=SubResource("mat")

@@ -32,4 +32,16 @@ func _on_restart() -> void:
 	GameManager.start_game()
 
 func _on_menu() -> void:
+	# Keep partial progress: gold/kills/time already banked via RunManager
+	run_commit()
 	GameManager.goto_menu()
+
+func _on_menu_pause_commit() -> void:
+	run_commit()
+
+func run_commit() -> void:
+	var run_manager: Node = get_tree().root.get_node_or_null("RunManager")
+	if run_manager != null:
+		run_manager.commit_partial_rewards()
+		run_manager.is_running = false
+	SaveManager.save_game()

@@ -1,5 +1,6 @@
 extends Area3D
 ## HeartPickup: rare drop that heals the player on contact. Pooled.
+## Now magnetized like XP shards and drawn as a red heart shape.
 
 const GRAVITY := 18.0
 
@@ -8,6 +9,8 @@ var _player: Node3D
 var _life: float = 0.0
 var _vertical_velocity: float = 3.0
 var _settled: bool = false
+
+@onready var _mesh: MeshInstance3D = $Mesh
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -26,13 +29,19 @@ func _process(delta: float) -> void:
 	if _life > 25.0:
 		PoolManager.release(self)
 		return
-	# Magnet: drift toward the player when close (no exact walk-over needed)
+	_mesh.rotation.y += 2.0 * delta
 	if _player != null and is_instance_valid(_player):
 		var to_p: Vector3 = _player.global_position - global_position
 		to_p.y = 0.0
-		if to_p.length() < 6.0 and to_p.length() > 0.2:
+		var d := to_p.length()
+		if d < 6.0 and d > 0.2:
 			global_position += to_p.normalized() * 11.0 * delta
-	_mesh_spin(delta)
+		if d < 1.4 and _player.health.is_alive():
+			_player.health.heal(heal_amount)
+			AudioManager.play_game_sfx("relic_pickup")
+			set_deferred("monitoring", false)
+			PoolManager.release(self)
+			return
 	if not _settled:
 		_vertical_velocity -= GRAVITY * delta
 		global_position.y += _vertical_velocity * delta
@@ -40,16 +49,9 @@ func _process(delta: float) -> void:
 			global_position.y = 0.5
 			_settled = true
 
-@onready var _mesh: MeshInstance3D = $Mesh
-func _mesh_spin(_delta: float) -> void:
-	_mesh.rotation.y += 2.5 * _delta
-
 func _on_body_entered(body: Node3D) -> void:
 	if not body.is_in_group("player"):
 		return
-	if body.has_method("take_contact_damage") == false:
-		return
 	body.health.heal(heal_amount)
-	AudioManager.play_game_sfx("relic_pickup")
 	set_deferred("monitoring", false)
 	PoolManager.release(self)

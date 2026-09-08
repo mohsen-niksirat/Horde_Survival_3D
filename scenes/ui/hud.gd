@@ -14,6 +14,7 @@ extends Control
 @onready var zoom_out_button: Button = $Abilities/ZoomRow/ZoomOut
 @onready var pause_button: Button = $PauseButton
 @onready var weapon_icons: HBoxContainer = $TopLeft/WeaponIcons
+@onready var boss_bar: ProgressBar = $BossBar
 @onready var hint_label: Label = $HintLabel
 
 ## V14 onboarding: rotating contextual hints during the first 90 seconds.

@@ -5,14 +5,14 @@
 [sub_resource type="SphereShape3D" id="shape"]
 radius=0.4
 
-[sub_resource type="SphereMesh" id="mesh"]
-radius=0.25
-height=0.5
+[sub_resource type="SphereMesh" id="lobe_mesh"]
+radius=0.18
+height=0.36
 
 [sub_resource type="StandardMaterial3D" id="mat"]
-albedo_color=Color(1, 0.25, 0.35, 1)
+albedo_color=Color(1, 0.2, 0.35, 1)
 emission_enabled=true
-emission=Color(1, 0.2, 0.3, 1)
+emission=Color(1, 0.15, 0.25, 1)
 emission_energy_multiplier=1.8
 
 [node name="HeartPickup" type="Area3D"]
@@ -25,5 +25,20 @@ script=ExtResource("1")
 shape=SubResource("shape")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
-mesh=SubResource("mesh")
+mesh=SubResource("lobe_mesh")
+surface_material_override/0=SubResource("mat")
+
+[node name="LobeL" type="MeshInstance3D" parent="Mesh"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11, 0.12, 0)
+mesh=SubResource("lobe_mesh")
+surface_material_override/0=SubResource("mat")
+
+[node name="LobeR" type="MeshInstance3D" parent="Mesh"]
+transform=Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.12, 0)
+mesh=SubResource("lobe_mesh")
+surface_material_override/0=SubResource("mat")
+
+[node name="Tip" type="MeshInstance3D" parent="Mesh"]
+transform=Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, -0.22, 0)
+mesh=SubResource("lobe_mesh")
 surface_material_override/0=SubResource("mat")

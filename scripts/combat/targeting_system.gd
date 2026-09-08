@@ -22,7 +22,8 @@ static func nearest(from: Vector3, candidates: Array, max_dist: float = 40.0) ->
 	return best
 
 ## Nearest target the player can actually SEE: prefers enemies in front of
-## the camera; falls back to any nearest candidate if none qualify.
+## the camera; falls back to any nearest candidate if none qualifies.
+## BOSS PRIORITY: if a boss is among candidates, it wins immediately.
 static func nearest_visible(from: Vector3, candidates: Array, max_dist: float, camera: Camera3D) -> Node3D:
 	if camera == null:
 		return nearest(from, candidates, max_dist)
@@ -34,6 +35,9 @@ static func nearest_visible(from: Vector3, candidates: Array, max_dist: float, c
 	for c in candidates:
 		if not is_instance_valid(c):
 			continue
+		# Bosses are always valid targets — the climax must be shootable
+		if c.is_in_group("boss"):
+			return c
 		var d2: float = from.distance_squared_to(c.global_position)
 		if d2 < best_any_d2:
 			best_any_d2 = d2

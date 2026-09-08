@@ -43,6 +43,15 @@ func register_kill() -> void:
 func add_gold(amount: float) -> void:
 	gold_earned += amount
 
+## Commit partial run rewards (used by pause->menu so progress isn't lost)
+func commit_partial_rewards() -> void:
+	var gold := int(gold_earned)
+	var total: int = SaveManager.get_meta_data("gold", 0)
+	SaveManager.set_meta_data("gold", total + gold)
+	SaveManager.set_meta_data("total_kills", SaveManager.get_meta_data("total_kills", 0) + kills)
+	if elapsed_time > float(SaveManager.get_meta_data("best_time", 0.0)):
+		SaveManager.set_meta_data("best_time", elapsed_time)
+
 func set_boss_active(active: bool) -> void:
 	boss_active = active
 

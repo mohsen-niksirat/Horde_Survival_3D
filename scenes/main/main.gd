@@ -24,6 +24,8 @@ var projectile_root: Node3D
 var _debug_enabled: bool = false
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS  # Esc/P must reach _unhandled_input while paused
+
 	RunManager.start_run()
 	GameManager.change_state(GameManager.State.PLAYING)
 
