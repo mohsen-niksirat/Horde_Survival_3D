@@ -123,6 +123,10 @@ value=1.0
 layout_mode=2
 text="Vibration (mobile)"
 
+[node name="FullscreenCheck" type="CheckButton" parent="Center/Panel/Layout"]
+layout_mode=2
+text="Fullscreen"
+
 [node name="QualityRow" type="HBoxContainer" parent="Center/Panel/Layout"]
 layout_mode=2
 

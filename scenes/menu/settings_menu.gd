@@ -7,6 +7,7 @@ extends Control
 @onready var sensitivity_slider: HSlider = $Center/Panel/Layout/SensRow/SensSlider
 @onready var touch_sens_slider: HSlider = $Center/Panel/Layout/TouchSensRow/TouchSensSlider
 @onready var haptics_check: CheckButton = $Center/Panel/Layout/HapticsCheck
+@onready var fullscreen_check: CheckButton = $Center/Panel/Layout/FullscreenCheck
 @onready var shake_check: CheckButton = $Center/Panel/Layout/ShakeCheck
 @onready var quality_option: OptionButton = $Center/Panel/Layout/QualityRow/QualityOption
 @onready var close_button: Button = $Center/Panel/Layout/CloseButton
@@ -26,6 +27,7 @@ func _ready() -> void:
 	sensitivity_slider.value = SaveManager.get_setting("look_sensitivity", 1.0)
 	touch_sens_slider.value = SaveManager.get_setting("touch_sensitivity", 1.0)
 	haptics_check.button_pressed = SaveManager.get_setting("haptics", false)
+	fullscreen_check.button_pressed = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
 	shake_check.button_pressed = SaveManager.get_setting("screen_shake", true)
 	quality_option.selected = SaveManager.get_setting("quality", 1)
 
@@ -35,6 +37,7 @@ func _ready() -> void:
 	sensitivity_slider.value_changed.connect(_on_sensitivity)
 	touch_sens_slider.value_changed.connect(_on_touch_sensitivity)
 	haptics_check.toggled.connect(_on_haptics)
+	fullscreen_check.toggled.connect(_on_fullscreen)
 	shake_check.toggled.connect(_on_shake)
 	quality_option.item_selected.connect(_on_quality)
 	close_button.pressed.connect(_on_close)
@@ -48,6 +51,17 @@ func _on_touch_sensitivity(value: float) -> void:
 
 func _on_haptics(pressed: bool) -> void:
 	SaveManager.set_setting("haptics", pressed)
+
+func _on_fullscreen(pressed: bool) -> void:
+	# Fullscreen on desktop; on web this requests browser fullscreen.
+	if pressed:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		if OS.get_name() == "Web":
+			JavaScriptBridge.eval("if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen()}", true)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		if OS.get_name() == "Web":
+			JavaScriptBridge.eval("if(document.exitFullscreen){document.exitFullscreen()}", true)
 
 func _on_state_changed(_new_state: int, _old: int) -> void:
 	pass

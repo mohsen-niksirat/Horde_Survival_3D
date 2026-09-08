@@ -158,6 +158,9 @@ func _ready() -> void:
 
 	debug_label.visible = false
 
+	# First-run tutorial: step-by-step controls before the action starts
+	$HUD/TutorialOverlay.show_if_needed()
+
 func _on_game_state_changed_for_mouse(new_state: int, _old: int) -> void:
 	_apply_mouse_mode(new_state)
 

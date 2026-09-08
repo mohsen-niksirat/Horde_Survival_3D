@@ -8,8 +8,10 @@ extends Control
 @onready var timer_label: Label = $Top/TimerLabel
 @onready var kills_label: Label = $TopRight/KillsLabel
 @onready var combo_label: Label = $Combo
-@onready var ability1_button: Button = $Abilities/Ability1
-@onready var ability2_button: Button = $Abilities/Ability2
+@onready var ability1_button: Button = $Abilities/AbilityRow/Ability1
+@onready var ability2_button: Button = $Abilities/AbilityRow/Ability2
+@onready var zoom_in_button: Button = $Abilities/ZoomRow/ZoomIn
+@onready var zoom_out_button: Button = $Abilities/ZoomRow/ZoomOut
 @onready var pause_button: Button = $PauseButton
 @onready var weapon_icons: HBoxContainer = $TopLeft/WeaponIcons
 @onready var hint_label: Label = $HintLabel
@@ -49,7 +51,9 @@ func bind_player(player: Node) -> void:
 	RunManager.kills_changed.connect(_on_kills)
 	EventBus.combo_changed.connect(_on_combo)
 	EventBus.upgrade_applied.connect(_on_upgrade_applied)
-	pause_button.pressed.connect(_on_pause_pressed)
+	pause_button.pressed.connect(_on_pause_pressed)	# Zoom buttons (desktop wheel alternative + mobile main zoom)
+	zoom_in_button.pressed.connect(func(): InputManager.add_zoom_delta(-0.18))
+	zoom_out_button.pressed.connect(func(): InputManager.add_zoom_delta(0.18))
 	_refresh_weapon_icons()
 
 func _on_upgrade_applied(_title: String) -> void:
@@ -159,14 +163,14 @@ func _on_combo(count: int, multiplier: float) -> void:
 	var tier: String = _combo_tier(count)
 	combo_label.text = "x%d COMBO %s\n(%.1f XP)" % [count, tier, multiplier]
 	combo_label.add_theme_color_override("font_color", TIER_COLORS.get(tier, Color.WHITE))
-	var size := 20 + mini(count / 10, 6) * 3
+	var size := 15 + mini(count / 10, 6) * 2
 	combo_label.add_theme_font_size_override("font_size", size)
 	# V7: pop + pulse animation on tier change
 	if tier != _last_tier and tier != "BRONZE":
 		_last_tier = tier
 		combo_label.pivot_offset = combo_label.size * 0.5
 		var tween := create_tween()
-		combo_label.scale = Vector2(1.6, 1.6)
+		combo_label.scale = Vector2(1.25, 1.25)
 		tween.tween_property(combo_label, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	elif count % 5 == 0:
 		combo_label.pivot_offset = combo_label.size * 0.5

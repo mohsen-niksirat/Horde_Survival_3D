@@ -3,12 +3,12 @@ extends Control
 ## Levels persist via SaveManager; applied at every run start.
 
 const STATS := [
-	{"id": "meta_hp", "name": "Vitality", "stat": "max_hp", "pct": 0.05},
-	{"id": "meta_might", "name": "Might", "stat": "might", "pct": 0.04},
-	{"id": "meta_cooldown", "name": "Frenzy", "stat": "cooldown_mult", "pct": -0.03},
-	{"id": "meta_speed", "name": "Swiftness", "stat": "move_speed", "pct": 0.03},
-	{"id": "meta_luck", "name": "Luck", "stat": "luck", "pct": 0.04},
-	{"id": "meta_gold", "name": "Greed", "stat": "gold_gain", "pct": 0.05},
+	{"id": "meta_hp", "name": "Vitality", "stat": "max_hp", "pct": 0.05, "effect": "Start every run with more max HP."},
+	{"id": "meta_might", "name": "Might", "stat": "might", "pct": 0.04, "effect": "All weapons deal more damage."},
+	{"id": "meta_cooldown", "name": "Frenzy", "stat": "cooldown_mult", "pct": -0.03, "effect": "Weapons fire more often (lower cooldown)."},
+	{"id": "meta_speed", "name": "Swiftness", "stat": "move_speed", "pct": 0.03, "effect": "Run faster; nothing can catch you."},
+	{"id": "meta_luck", "name": "Luck", "stat": "luck", "pct": 0.04, "effect": "Better random drops (future-proof stat)."},
+	{"id": "meta_gold", "name": "Greed", "stat": "gold_gain", "pct": 0.05, "effect": "Earn more gold from every kill."},
 ]
 const MAX_LEVEL := 20
 
@@ -33,6 +33,18 @@ func _level(id: String) -> int:
 func _cost(level: int) -> int:
 	return 50 + level * 75
 
+## Current total bonus text for a stat (from purchased levels).
+func _current_bonus(s: Dictionary) -> String:
+	var lvl := _level(s["id"])
+	if lvl <= 0:
+		return "no bonus yet"
+	var pct: float = s["pct"] * lvl
+	if s["stat"] == "max_hp":
+		return "current: +%.0f max HP" % (100.0 * pct)
+	if s["stat"] == "cooldown_mult":
+		return "current: -%.0f%% cooldown" % absf(pct * 100.0)
+	return "current: %+.0f%%" % (pct * 100.0)
+
 func _build_rows() -> void:
 	for s in STATS:
 		var row := HBoxContainer.new()
@@ -50,7 +62,23 @@ func _build_rows() -> void:
 		buy.custom_minimum_size = Vector2(130, 34)
 		buy.pressed.connect(_on_buy.bind(s))
 		row.add_child(buy)
+		# '?' info button: what it affects + how much it has given so far
+		var info := Button.new()
+		info.name = "Info"
+		info.text = "?"
+		info.custom_minimum_size = Vector2(34, 34)
+		info.pressed.connect(_on_info.bind(s))
+		row.add_child(info)
 		rows.add_child(row)
+
+func _on_info(s: Dictionary) -> void:
+	AudioManager.play_game_sfx("ui_click")
+	var msg := "%s\n%s\nLevel %d/20 -> %s" % [
+		s["name"], s["effect"], _level(s["id"]), _current_bonus(s),
+	]
+	_info_label.text = msg
+
+@onready var _info_label: Label = $Center/Panel/Layout/InfoLabel
 
 func _refresh() -> void:
 	gold_label.text = "Gold: %d" % SaveManager.get_meta_data("gold", 0)
