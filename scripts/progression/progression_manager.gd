@@ -6,8 +6,9 @@ const PASSIVE_IDS := [
 	"spinach", "empty_tome", "crown", "wings",
 	"magnet", "heart", "growth", "vampire",
 ]
-const MAX_WEAPON_SLOTS := 4
+const MAX_WEAPON_SLOTS := 5
 const CHOICES := 3
+const NEW_WEAPON_POOL := ["fireball", "magic_missile", "orbiting_shield", "divine_spear", "lightning"]
 
 signal choices_generated(choices: Array)
 
@@ -87,21 +88,39 @@ func _fill_pool(pool: Array) -> void:
 		opt.target = evo
 		pool.append(opt)
 
-	# Weapon tier-ups
+	# Weapon tier-ups — with a REAL description of what improves
 	for w in weapons:
 		if w.level < 5:
 			var opt := UpgradeOption.new()
 			opt.kind = UpgradeOption.Kind.WEAPON_TIER
 			opt.rarity = "rare" if w.level >= 3 else "common"
 			opt.title = w.data.display_name
-			opt.description = "Upgrade to level %d" % (w.level + 1)
+			opt.description = _tier_description(w)
 			opt.target = w.data
 			opt.current_level = w.level
 			opt.next_level = w.level + 1
 			pool.append(opt)
 
-	# New weapons (MVP: fireball only exists; offer passives more often)
-	# Passives
+	# New weapons: offer any not-yet-held weapon (player may hold max 5)
+	if weapons.size() < MAX_WEAPON_SLOTS:
+		var held: Array = []
+		for w in weapons:
+			held.append(w.data.id)
+		for wid in NEW_WEAPON_POOL:
+			if held.has(wid):
+				continue
+			var wdata: WeaponData = load("res://data/weapons/%s.tres" % wid)
+			if wdata == null:
+				continue
+			var nopt := UpgradeOption.new()
+			nopt.kind = UpgradeOption.Kind.NEW_WEAPON
+			nopt.rarity = "rare"
+			nopt.title = "NEW: " + wdata.display_name
+			nopt.description = wdata.display_name + " — " + _weapon_role(wid)
+			nopt.target = wdata
+			nopt.current_level = 0
+			nopt.next_level = 1
+			pool.append(nopt)
 	for id in passive_data:
 		var data: PassiveData = passive_data[id]
 		var lvl: int = passive_levels.get(id, 0)
@@ -172,6 +191,10 @@ func apply_choice(option: UpgradeOption) -> void:
 				if w.data == option.target:
 					w.level_up()
 					break
+		UpgradeOption.Kind.NEW_WEAPON:
+			if player.weapon_controller.weapons.size() < MAX_WEAPON_SLOTS:
+				player.weapon_controller.add_weapon(option.target)
+				_check_synergies()
 		UpgradeOption.Kind.PASSIVE:
 			var id: String = option.target.id
 			passive_levels[id] = passive_levels.get(id, 0) + 1
@@ -187,3 +210,34 @@ func _weapon_name(id: String) -> String:
 		if w.data.id == id:
 			return w.data.display_name
 	return id
+
+## Human-readable tier-up description from actual stat deltas.
+func _tier_description(w: WeaponInstance) -> String:
+	var lvl: int = w.level  # option advances to level+1
+	var idx: int = clampi(lvl - 1, 0, 4)
+	var nxt: int = clampi(lvl, 0, 4)
+	var parts: Array = []
+	var dmg_mult: float = w.data.tier_damage_mult[nxt] / w.data.tier_damage_mult[idx]
+	if dmg_mult > 1.01:
+		parts.append("+%d%% damage" % int(round((dmg_mult - 1.0) * 100.0)))
+	var proj_bonus: int = w.data.tier_projectile_bonus[nxt] - w.data.tier_projectile_bonus[idx]
+	if proj_bonus > 0:
+		parts.append("+%d projectile" % proj_bonus)
+	var area_mult: float = w.data.tier_area_mult[nxt] / w.data.tier_area_mult[idx]
+	if area_mult > 1.01:
+		parts.append("+%d%% area" % int(round((area_mult - 1.0) * 100.0)))
+	var cd_mult: float = w.data.tier_cooldown_mult[nxt] / w.data.tier_cooldown_mult[idx]
+	if cd_mult < 0.99:
+		parts.append("-%d%% cooldown" % int(round((1.0 - cd_mult) * 100.0)))
+	if parts.is_empty():
+		parts.append("stronger")
+	return "Lv %d: %s" % [lvl + 1, " | ".join(parts)]
+
+func _weapon_role(id: String) -> String:
+	match id:
+		"fireball": return "explosive AOE, burn synergy"
+		"magic_missile": return "homing bolts, multi-target"
+		"orbiting_shield": return "orbiting guards, melee range"
+		"divine_spear": return "piercing line, high crit"
+		"lightning": return "AOE strikes, detonates burning foes"
+	return "auto-attack weapon"
