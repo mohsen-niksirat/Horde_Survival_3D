@@ -44,6 +44,13 @@ func _ready() -> void:
 		player.stat_block.add_modifier("max_hp", 0.0, ch.max_hp_pct)
 		player.stat_block.add_modifier("move_speed", 0.0, ch.move_speed_pct)
 		player.stat_block.add_modifier("might", 0.0, ch.might_pct)
+		# P3-lite: tint hero robe/hood with the character color at run start
+		var robe: MeshInstance3D = player.get_node_or_null("Mesh/Root/Robe")
+		var hood: MeshInstance3D = player.get_node_or_null("Mesh/Root/Hood")
+		if robe != null:
+			robe.get_surface_override_material(0).albedo_color = ch.color
+		if hood != null:
+			hood.get_surface_override_material(0).albedo_color = ch.color.darkened(0.25)
 	player.on_stats_changed()
 	player.health.setup(player.stat_block.get_stat("max_hp"))
 

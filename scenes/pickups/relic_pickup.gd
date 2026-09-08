@@ -47,6 +47,10 @@ func _process(delta: float) -> void:
 		return
 	# Slow spin (visual identity)
 	_mesh.rotation.y += 2.0 * delta
+	# P2 pickup readability: pulsing glow so relics stand out mid-horde
+	if _mat != null:
+		_mat.emission_energy_multiplier = 1.2 + sin(_life * 5.0) * 0.8
+		_mesh.scale = Vector3.ONE * (1.0 + sin(_life * 3.0) * 0.12)
 	# Settle to ground
 	if not _settled:
 		_vertical_velocity -= GRAVITY * delta
