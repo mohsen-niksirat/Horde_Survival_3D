@@ -2,7 +2,7 @@
 
 A stylized third-person survival roguelite for the browser. Survive increasingly dangerous hordes, auto-attack weapons, collect XP, choose powerful upgrades, evolve weapons, fight elites and a phased boss — and build increasingly broken runs.
 
-**Play:** https://mohsen-niksirat.github.io/Horde_Survival_3D/ (after Pages is enabled)
+**Play:** https://mohsen-niksirat.github.io/Horde_Survival_3D_Godot/ (after Pages is enabled)
 
 Inspired by the gameplay philosophy of [HordeSurvival (Android)](https://github.com/mohsen-niksirat/HordeSurvival), rebuilt from scratch as an independent Godot 4 project.
 
@@ -41,7 +41,7 @@ Deployment is automated via GitHub Actions (`.github/workflows/deploy-web.yml`):
 2. Enable **Settings → Pages → Source: GitHub Actions** (one time)
 3. The workflow builds the Web export and deploys it to Pages
 
-Manual URL after setup: `https://mohsen-niksirat.github.io/Horde_Survival_3D/`
+Manual URL after setup: `https://mohsen-niksirat.github.io/Horde_Survival_3D_Godot/`
 
 ## How to Export Android (future)
 

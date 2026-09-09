@@ -28,7 +28,7 @@ Note: WebGL builds require a server (file:// won't load WASM).
 
 One-time setup: **Repository Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-The live URL becomes: `https://mohsen-niksirat.github.io/Horde_Survival_3D/`
+The live URL becomes: `https://mohsen-niksirat.github.io/Horde_Survival_3D_Godot/`
 
 ## The Custom Loading Shell
 
