@@ -25,6 +25,12 @@ var _debug_enabled: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS  # Esc/P must reach _unhandled_input while paused
+	# Keep the WORLD pausable: children would otherwise inherit ALWAYS and
+	# keep running (enemies attacking) while the pause overlay is up.
+	$World.process_mode = Node.PROCESS_MODE_PAUSABLE
+	$HUD/TutorialOverlay.process_mode = Node.PROCESS_MODE_ALWAYS
+	$HUD/PauseOverlay.process_mode = Node.PROCESS_MODE_ALWAYS
+	$HUD/LevelUpOverlay.process_mode = Node.PROCESS_MODE_ALWAYS
 
 	RunManager.start_run()
 	GameManager.change_state(GameManager.State.PLAYING)
@@ -32,6 +38,7 @@ func _ready() -> void:
 	enemy_manager = Node.new()
 	enemy_manager.set_script(ENEMY_MANAGER)
 	enemy_manager.name = "EnemyManager"
+	enemy_manager.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(enemy_manager)
 
 	# V9+V13: apply meta upgrades AND selected character stats FIRST
@@ -55,6 +62,7 @@ func _ready() -> void:
 	# Projectile container + weapon binding
 	projectile_root = Node3D.new()
 	projectile_root.name = "Projectiles"
+	projectile_root.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(projectile_root)
 	player.bind_combat(enemy_manager, projectile_root)
 
@@ -62,6 +70,7 @@ func _ready() -> void:
 	wave_manager = Node.new()
 	wave_manager.set_script(WAVE_MANAGER)
 	wave_manager.name = "WaveManager"
+	wave_manager.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(wave_manager)
 	wave_manager.setup($World, player, enemy_manager)
 
@@ -69,6 +78,7 @@ func _ready() -> void:
 	progression = Node.new()
 	progression.set_script(PROGRESSION)
 	progression.name = "ProgressionManager"
+	progression.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(progression)
 	progression.setup(player)
 	player.progression = progression
@@ -105,6 +115,7 @@ func _ready() -> void:
 	# Pet (Dragon Welp)
 	var pet_scene: PackedScene = load("res://scenes/player/Pet.tscn")
 	var pet := pet_scene.instantiate()
+	pet.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(pet)
 	pet.setup(player, enemy_manager, projectile_root)
 
@@ -126,6 +137,9 @@ func _ready() -> void:
 	juice.name = "JuiceManager"
 	add_child(juice)
 	juice.setup(player)
+
+	# Juice/pet/projectile VFX belong to the pausable world too
+	juice.process_mode = Node.PROCESS_MODE_PAUSABLE
 
 	# V8 procedural music with state-driven intensity
 	var music := Node.new()

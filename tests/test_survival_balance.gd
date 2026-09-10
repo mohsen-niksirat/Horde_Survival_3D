@@ -16,6 +16,7 @@ func _initialize() -> void:
 	var em: Node = main.get_node("EnemyManager")
 	var game_manager := root.get_node("GameManager")
 	game_manager.state = game_manager.State.PLAYING
+	main.get_node("HUD/TutorialOverlay")._finish()
 	main.get_node("WaveManager").stop()
 	em.clear_all()
 	player.experience.xp_to_next = 999999.0

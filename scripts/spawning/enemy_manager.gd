@@ -54,7 +54,10 @@ func _cull_far_enemies() -> void:
 func _spawn_now(req: Dictionary) -> void:
 	var enemy := PoolManager.acquire(ENEMY_SCENE)
 	PoolManager.tag(enemy, ENEMY_SCENE)
-	get_parent().add_child(enemy)
+	var container: Node = get_node_or_null("../World")
+	if container == null:
+		container = get_parent()
+	container.add_child(enemy)
 	enemy.global_position = req["position"]
 	enemy.setup(req["data"], req["player"], req["hp"], req["dmg"], req["spd"])
 	# Elite promotion
