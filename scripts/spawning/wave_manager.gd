@@ -74,13 +74,20 @@ func _tick_boss() -> void:
 func _spawn_boss(stat_scale: float = 1.0) -> void:
 	var boss_scene: PackedScene = load(BOSS_SCENE)
 	var boss := boss_scene.instantiate()
-	get_parent().add_child(boss)
+	# Spawn under the World (PAUSABLE) so the boss obeys pause and is a
+	# normal child of the arena — NOT under Main (ALWAYS).
+	get_parent().get_node("World").add_child(boss)
 	var angle := randf() * TAU
 	var pos := player.global_position + Vector3(cos(angle), 0, sin(angle)) * 20.0
 	pos.x = clampf(pos.x, -55, 55)
 	pos.z = clampf(pos.z, -55, 55)
 	boss.global_position = Vector3(pos.x, 0.5, pos.z)
 	boss.setup(player, enemy_manager, arena, DifficultyManager.hp_scale(DifficultyManager.difficulty_multiplier(player.experience.level, RunManager.elapsed_time / 60.0)) * 0.4 * stat_scale)
+	# Register the boss in the active list so weapons can target it
+	if not enemy_manager.active_enemies.has(boss):
+		enemy_manager.active_enemies.append(boss)
+	PerformanceManager.active_enemies = enemy_manager.active_enemies.size()
+	boss.boss_died.connect(func(): enemy_manager.active_enemies.erase(boss))
 	RunManager.set_boss_active(true)
 	GameManager.change_state(GameManager.State.BOSS)
 	EventBus.boss_spawned.emit(boss)

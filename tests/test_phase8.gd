@@ -90,7 +90,7 @@ func _initialize() -> void:
 		await process_frame
 		await physics_frame
 	var boss: Node3D = null
-	for child in main.get_children():
+	for child in main.get_node("World").get_children():
 		if child.is_in_group("boss"):
 			boss = child
 	_check(boss != null, "boss spawned")
